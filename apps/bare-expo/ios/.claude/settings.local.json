@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/chrfalch/repos/expo/expo-scratch/**)",
+      "Bash(ls packages/expo-background-task/src/BackgroundTaskDev*)",
+      "Bash(mv packages/expo-background-task/src/BackgroundTaskDevClient.ts packages/expo-background-task/src/BackgroundTaskDevToolsClient.ts)",
+      "Bash(mv packages/expo-background-task/cli/src/index.ts packages/expo-background-task/cli/src/index.mts)",
+      "Bash(rm packages/expo-background-task/cli/package.json)",
+      "Bash(et check-packages:*)"
+    ]
+  }
+}
