@@ -108,3 +108,27 @@ internal final class FeatureNotAvailableOnPlatformException: Exception {
     "This feature is not available on this platform"
   }
 }
+
+internal final class UnableToUploadException: GenericException<String> {
+  override var reason: String {
+    "Unable to upload a file: \(param)"
+  }
+}
+
+internal final class InvalidUrlException: GenericException<String> {
+  override var reason: String {
+    "Invalid URL: \(param)"
+  }
+}
+
+internal final class InvalidResumeDataException: Exception {
+  override var reason: String {
+    "Invalid resume data provided"
+  }
+}
+
+internal final class DownloadCancelledException: Exception {
+  override var reason: String {
+    "Download was cancelled"
+  }
+}
