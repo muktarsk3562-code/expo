@@ -18,6 +18,7 @@ export {
   type DownloadTaskOptions,
   type DownloadProgress,
   type DownloadPauseState,
+  type TaskState,
 } from './ExpoFileSystem.types';
 
 export * from './legacyWarnings';
