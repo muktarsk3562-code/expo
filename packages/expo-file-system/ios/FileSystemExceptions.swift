@@ -132,3 +132,22 @@ internal final class DownloadCancelledException: Exception {
     "Download was cancelled"
   }
 }
+
+internal final class UploadCancelledException: Exception {
+  override var reason: String {
+    "Upload was cancelled"
+  }
+}
+
+internal final class FailedToCreateBodyException: Exception {
+  override var reason: String {
+    "Failed to create multipart body"
+  }
+}
+
+internal final class FailedToAccessDirectoryException: Exception {
+  override var reason: String {
+    "Failed to access cache directory for upload temp file"
+  }
+}
+
