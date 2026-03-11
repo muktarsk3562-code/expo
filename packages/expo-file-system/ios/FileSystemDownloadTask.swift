@@ -136,6 +136,7 @@ class DownloadTaskDelegate: NSObject, URLSessionDataDelegate {
   private var expectedTotalBytes: Int64 = -1
   private var lastProgressTime: TimeInterval = 0
   private let progressThrottleInterval: TimeInterval = 0.1 // 100ms
+  private var settled = false
 
   init(sharedObject: FileSystemDownloadTask, destinationUrl: URL, offset: Int64, promise: Promise) {
     self.sharedObject = sharedObject
@@ -159,6 +160,7 @@ class DownloadTaskDelegate: NSObject, URLSessionDataDelegate {
     if let httpResponse,
        !(200...299).contains(httpResponse.statusCode) && httpResponse.statusCode != 206 {
       completionHandler(.cancel)
+      settled = true
       promise.reject(UnableToDownloadException("server returned HTTP \(httpResponse.statusCode)"))
       return
     }
@@ -174,6 +176,13 @@ class DownloadTaskDelegate: NSObject, URLSessionDataDelegate {
       totalBytesWritten = 0
       FileManager.default.createFile(atPath: destinationUrl.path, contents: nil)
       fileHandle = try? FileHandle(forWritingTo: destinationUrl)
+    }
+
+    if fileHandle == nil {
+      completionHandler(.cancel)
+      settled = true
+      promise.reject(UnableToDownloadException("Failed to open file for writing: \(destinationUrl.path)"))
+      return
     }
 
     let contentLength = response.expectedContentLength
@@ -205,6 +214,13 @@ class DownloadTaskDelegate: NSObject, URLSessionDataDelegate {
   func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
     fileHandle?.closeFile()
     fileHandle = nil
+
+    // Guard against double-resolve (e.g., HTTP status rejection followed by cancellation callback)
+    guard !settled else {
+      session.finishTasksAndInvalidate()
+      return
+    }
+    settled = true
 
     if let error = error {
       let nsError = error as NSError

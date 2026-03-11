@@ -136,6 +136,7 @@ class FileSystemDownloadTask : SharedObject() {
         override fun onResponse(call: Call, response: Response) {
           try {
             if (!response.isSuccessful) {
+              response.close()
               safeResumeWithException(UnableToDownloadException("HTTP ${response.code}"))
               return
             }
