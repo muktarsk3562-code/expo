@@ -393,6 +393,9 @@ export class DownloadTask extends ExpoFileSystem.FileSystemDownloadTask {
 
   async resumeAsync(): Promise<File | null> {
     this._assertState(['paused'], 'resumeAsync');
+    if (!this._resumeData) {
+      throw new Error('No resume data available. Was the download paused before any data was received?');
+    }
     this._state = 'active';
     try {
       this._wireAbortSignal();
@@ -405,7 +408,7 @@ export class DownloadTask extends ExpoFileSystem.FileSystemDownloadTask {
       const result = await super.resume(
         this._url,
         this._destination,
-        this._resumeData!,
+        this._resumeData,
         nativeOpts
       );
       if (result) {

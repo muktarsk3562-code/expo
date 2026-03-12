@@ -168,9 +168,10 @@ class DownloadTaskDelegate: NSObject, URLSessionDataDelegate {
     let isPartial = httpResponse?.statusCode == 206
 
     if offset > 0 && isPartial {
-      // Server supports Range — append to existing file
+      // Server supports Range — truncate to offset and write from there
       fileHandle = try? FileHandle(forWritingTo: destinationUrl)
-      fileHandle?.seekToEndOfFile()
+      fileHandle?.truncateFile(atOffset: UInt64(offset))
+      fileHandle?.seek(toFileOffset: UInt64(offset))
     } else {
       // Fresh download or server ignored Range header (200 instead of 206) — truncate and restart
       totalBytesWritten = 0
