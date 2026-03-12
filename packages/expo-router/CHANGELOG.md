@@ -11,6 +11,7 @@
 
 - [android] add toolbar support ([#43970](https://github.com/expo/expo/pull/43970) by [@Ubax](https://github.com/Ubax))
 - [android] add support for menus in toolbar ([#43979](https://github.com/expo/expo/pull/43979) by [@Ubax](https://github.com/Ubax))
+- Allow users to customize route-level `<Suspense>` fallback
 
 ### 🐛 Bug fixes
 
