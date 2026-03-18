@@ -118,35 +118,47 @@ export default createRunOncePlugin<PluginConfigType>(
   (config, props = {}) => {
     validateConfig(props);
 
+    const defaultLauncherURI = props.defaultLaunchURI;
     const iOSLaunchMode =
       props.ios?.launchMode ??
       props.launchMode ??
       props.ios?.launchModeExperimental ??
       props.launchModeExperimental;
-    if (iOSLaunchMode === 'launcher') {
-      config = withInfoPlist(config, (config) => {
+
+    config = withInfoPlist(config, (config) => {
+      if (iOSLaunchMode === 'launcher') {
         config.modResults['DEV_CLIENT_TRY_TO_LAUNCH_LAST_BUNDLE'] = false;
-        return config;
-      });
-    }
+      }
+      if (defaultLauncherURI) {
+        config.modResults['DEV_CLIENT_DEFAULT_LAUNCHER_URI'] = defaultLauncherURI;
+      }
+      return config;
+    });
 
     const androidLaunchMode =
       props.android?.launchMode ??
       props.launchMode ??
       props.android?.launchModeExperimental ??
       props.launchModeExperimental;
-    if (androidLaunchMode === 'launcher') {
-      config = withAndroidManifest(config, (config) => {
-        const mainApplication = AndroidConfig.Manifest.getMainApplicationOrThrow(config.modResults);
 
+    config = withAndroidManifest(config, (config) => {
+      const mainApplication = AndroidConfig.Manifest.getMainApplicationOrThrow(config.modResults);
+      if (androidLaunchMode === 'launcher') {
         AndroidConfig.Manifest.addMetaDataItemToMainApplication(
           mainApplication,
           'DEV_CLIENT_TRY_TO_LAUNCH_LAST_BUNDLE',
           false?.toString()
         );
-        return config;
-      });
-    }
+      }
+      if (defaultLauncherURI) {
+        AndroidConfig.Manifest.addMetaDataItemToMainApplication(
+          mainApplication,
+          'DEV_CLIENT_DEFAULT_LAUNCHER_URI',
+          defaultLauncherURI
+        );
+      }
+      return config;
+    });
 
     config = withLocalNetworkPermission(config);
     config = withStripLocalNetworkKeysForRelease(config);
