@@ -362,9 +362,7 @@ public final class FileSystemModule: Module {
         return FileSystemUploadTask()
       }
 
-      // Events("progress")
-
-      AsyncFunction("start") { (task: FileSystemUploadTask, url: URL, file: FileSystemFile, options: UploadOptions, promise: Promise) in
+      AsyncFunction("start") { (task: FileSystemUploadTask, url: URL, file: FileSystemFile, options: UploadTaskOptions, promise: Promise) in
         task.start(url: url, file: file, options: options, promise: promise)
       }
 
@@ -377,8 +375,6 @@ public final class FileSystemModule: Module {
       Constructor {
         return FileSystemDownloadTask()
       }
-
-      // Events("progress")
 
       AsyncFunction("start") { (task: FileSystemDownloadTask, url: URL, to: FileSystemPath, options: DownloadTaskOptions?, promise: Promise) in
         try to.validatePermission(.write)

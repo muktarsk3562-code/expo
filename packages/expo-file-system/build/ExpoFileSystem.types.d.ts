@@ -567,6 +567,10 @@ export type UploadOptions = {
     parameters?: Record<string, string>;
     /**
      * Callback for upload progress updates.
+     *
+     * > **Note:** For multipart uploads, the reported bytes may include multipart framing overhead
+     * > (boundary strings, headers, form parameters) in addition to the file content.
+     * > This matches the behavior of the legacy `FileSystem.createUploadTask()` API.
      */
     onProgress?: (data: UploadProgress) => void;
     /**
@@ -600,9 +604,13 @@ export type DownloadPauseState = {
      */
     url: string;
     /**
-     * The destination file URI.
+     * The destination file or directory URI.
      */
     fileUri: string;
+    /**
+     * Whether the destination is a directory. When `true`, the filename is derived from the URL.
+     */
+    isDirectory: boolean;
     /**
      * Custom headers that were used for the download request.
      */
