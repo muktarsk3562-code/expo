@@ -36,10 +36,15 @@ enum class UploadType(val value: Int) : Enumerable {
  */
 class UploadTaskOptions : Record {
   @Field var headers: Map<String, String>? = null
+
   @Field var httpMethod: String = "POST"
+
   @Field var uploadType: UploadType = UploadType.BINARY_CONTENT
+
   @Field var fieldName: String? = null
+
   @Field var mimeType: String? = null
+
   @Field var parameters: Map<String, String>? = null
 }
 
@@ -48,7 +53,9 @@ class UploadTaskOptions : Record {
  */
 class UploadTaskResult : Record {
   @Field var body: String = ""
+
   @Field var status: Int = 0
+
   @Field var headers: Map<String, String> = emptyMap()
 }
 
@@ -163,8 +170,8 @@ class FileSystemUploadTask : SharedObject() {
 
     // Determine MIME type
     val fileName = file.fileName ?: "upload"
-    val mimeType = options.mimeType ?: file.type ?: URLConnection.guessContentTypeFromName(fileName) ?:
-    "application/octet-stream"
+    val mimeType = options.mimeType ?: file.type ?: URLConnection.guessContentTypeFromName(fileName)
+      ?: "application/octet-stream"
 
     // Add file part with progress tracking
     val fieldName = options.fieldName ?: fileName
@@ -184,10 +191,13 @@ class FileSystemUploadTask : SharedObject() {
 
     if (shouldEmit) {
       lastProgressTime = currentTime
-      emit("progress", mapOf(
-        "bytesSent" to bytesWritten,
-        "totalBytes" to totalBytes
-      ))
+      emit(
+        "progress",
+        mapOf(
+          "bytesSent" to bytesWritten,
+          "totalBytes" to totalBytes
+        )
+      )
     }
   }
 }
