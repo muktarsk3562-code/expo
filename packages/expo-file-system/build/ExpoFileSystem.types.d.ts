@@ -570,7 +570,6 @@ export type UploadOptions = {
      *
      * > **Note:** For multipart uploads, the reported bytes may include multipart framing overhead
      * > (boundary strings, headers, form parameters) in addition to the file content.
-     * > This matches the behavior of the legacy `FileSystem.createUploadTask()` API.
      */
     onProgress?: (data: UploadProgress) => void;
     /**
