@@ -1,5 +1,5 @@
 import ExpoFileSystem from './ExpoFileSystem';
-import { DownloadOptions, PathInfo, UploadOptions, UploadResult, DownloadTaskOptions, DownloadPauseState } from './ExpoFileSystem.types';
+import { DownloadOptions, PathInfo, UploadOptions, UploadResult, DownloadTaskOptions, DownloadPauseState, TaskState } from './ExpoFileSystem.types';
 import { PathUtilities } from './pathUtilities';
 export declare class Paths extends PathUtilities {
     /**
@@ -111,20 +111,26 @@ export declare class Directory extends ExpoFileSystem.FileSystemDirectory {
  * Represents an upload task with progress tracking and cancellation support.
  */
 export declare class UploadTask extends ExpoFileSystem.FileSystemUploadTask {
+    private _state;
     private _file;
     private _url;
     private _options?;
     private _subscription?;
     private _abortHandler?;
     constructor(file: File, url: string, options?: UploadOptions);
+    get state(): TaskState;
     uploadAsync(): Promise<UploadResult>;
     cancel(): void;
+    private _assertState;
+    private _wireAbortSignal;
+    private _wireProgress;
     private _cleanup;
 }
 /**
  * Represents a download task with pause/resume support and progress tracking.
  */
 export declare class DownloadTask extends ExpoFileSystem.FileSystemDownloadTask {
+    private _state;
     private _url;
     private _destination;
     private _options?;
@@ -132,13 +138,19 @@ export declare class DownloadTask extends ExpoFileSystem.FileSystemDownloadTask 
     private _subscription?;
     private _abortHandler?;
     constructor(url: string, destination: File | Directory, options?: DownloadTaskOptions);
+    get state(): TaskState;
     downloadAsync(): Promise<File | null>;
-    pauseAsync(): Promise<DownloadPauseState>;
+    pause(): {
+        resumeData: string;
+    };
     resumeAsync(): Promise<File | null>;
     cancel(): void;
     savable(): DownloadPauseState;
-    static fromSavable(state: DownloadPauseState): DownloadTask;
-    private _setupListeners;
-    private _cleanupListeners;
+    static fromSavable(state: DownloadPauseState, options?: DownloadTaskOptions): DownloadTask;
+    private _assertState;
+    private _wireAbortSignal;
+    private _wireProgress;
+    private _cleanup;
+    private _emitFinalProgressEvent;
 }
 //# sourceMappingURL=FileSystem.d.ts.map
