@@ -1,13 +1,13 @@
 package expo.modules.filesystem
 
 import expo.modules.filesystem.unifiedfile.UnifiedFileInterface
+import expo.modules.kotlin.types.Enumerable
 import expo.modules.kotlin.records.Field
 import expo.modules.kotlin.records.Record
 import expo.modules.kotlin.sharedobjects.SharedObject
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Call
 import okhttp3.Callback
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -26,13 +26,18 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
+enum class UploadType(val value: Int) : Enumerable {
+  BINARY_CONTENT(0),
+  MULTIPART(1)
+}
+
 /**
  * Record type for upload options.
  */
-class UploadOptionsRecord : Record {
+class UploadTaskOptions : Record {
   @Field var headers: Map<String, String>? = null
   @Field var httpMethod: String = "POST"
-  @Field var uploadType: Int = 0
+  @Field var uploadType: UploadType = UploadType.BINARY_CONTENT
   @Field var fieldName: String? = null
   @Field var mimeType: String? = null
   @Field var parameters: Map<String, String>? = null
@@ -41,7 +46,7 @@ class UploadOptionsRecord : Record {
 /**
  * Record type for upload result.
  */
-class UploadResultRecord : Record {
+class UploadTaskResult : Record {
   @Field var body: String = ""
   @Field var status: Int = 0
   @Field var headers: Map<String, String> = emptyMap()
@@ -60,7 +65,7 @@ class FileSystemUploadTask : SharedObject() {
   private var lastProgressTime: Long = 0
   private val progressThrottleInterval: Long = 100 // 100ms
 
-  suspend fun start(url: String, file: FileSystemFile, options: UploadOptionsRecord): UploadResultRecord {
+  suspend fun start(url: String, file: FileSystemFile, options: UploadTaskOptions): UploadTaskResult {
     val unifiedFile = file.file
 
     if (!unifiedFile.exists()) {
@@ -69,8 +74,8 @@ class FileSystemUploadTask : SharedObject() {
 
     // Build request body
     val requestBody = when (options.uploadType) {
-      1 -> createMultipartBody(unifiedFile, options) // MULTIPART
-      else -> createBinaryBody(unifiedFile) // BINARY_CONTENT
+      UploadType.MULTIPART -> createMultipartBody(unifiedFile, options)
+      UploadType.BINARY_CONTENT -> createBinaryBody(unifiedFile)
     }
 
     // Build request
@@ -86,7 +91,7 @@ class FileSystemUploadTask : SharedObject() {
     return suspendCancellableCoroutine { continuation ->
       val settled = AtomicBoolean(false)
 
-      fun safeResume(value: UploadResultRecord) {
+      fun safeResume(value: UploadTaskResult) {
         if (settled.compareAndSet(false, true)) {
           continuation.resume(value)
         }
@@ -114,7 +119,7 @@ class FileSystemUploadTask : SharedObject() {
             val body = response.body?.string() ?: ""
             val headers = response.headers.toMultimap().mapValues { it.value.firstOrNull() ?: "" }
 
-            val result = UploadResultRecord()
+            val result = UploadTaskResult()
             result.body = body
             result.status = response.code
             result.headers = headers
@@ -148,7 +153,7 @@ class FileSystemUploadTask : SharedObject() {
     }
   }
 
-  private fun createMultipartBody(file: UnifiedFileInterface, options: UploadOptionsRecord): RequestBody {
+  private fun createMultipartBody(file: UnifiedFileInterface, options: UploadTaskOptions): RequestBody {
     val bodyBuilder = MultipartBody.Builder().setType(MultipartBody.FORM)
 
     // Add form parameters
