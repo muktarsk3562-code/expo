@@ -282,6 +282,17 @@ export class UploadTask extends ExpoFileSystem.FileSystemUploadTask {
 
       const result = await super.start(this._url, this._file, nativeOpts);
       this._state = 'completed';
+
+      // Emit a synthetic final progress to guarantee 100% is reported.
+      // Native progress events may not fire for small files, and even when they do,
+      // the event can race with promise resolution (listener removed before delivery).
+      if (this._options?.onProgress && this._file.exists) {
+        const size = this._file.size ?? 0;
+        if (size > 0) {
+          this._options.onProgress({ bytesSent: size, totalBytes: size });
+        }
+      }
+
       return result;
     } catch (error) {
       this._state = this._options?.signal?.aborted ? 'cancelled' : 'error';
