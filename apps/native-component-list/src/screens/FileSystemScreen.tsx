@@ -1,14 +1,7 @@
 import Checkbox from 'expo-checkbox';
 import * as Contacts from 'expo-contacts';
 import * as DocumentPicker from 'expo-document-picker';
-import {
-  File,
-  Directory,
-  Paths,
-  FileMode,
-  UploadType,
-  DownloadTask,
-} from 'expo-file-system';
+import { File, Directory, Paths, FileMode, UploadType, DownloadTask } from 'expo-file-system';
 import type {
   FileHandle,
   UploadProgress,
@@ -323,7 +316,7 @@ function FileHandleSection({ currentFile }: { currentFile: File | null }) {
     return () => {
       try {
         handleRef.current?.close();
-      } catch { }
+      } catch {}
       handleRef.current = null;
     };
   }, []);
@@ -332,7 +325,7 @@ function FileHandleSection({ currentFile }: { currentFile: File | null }) {
     if (handleRef.current) {
       try {
         handleRef.current.close();
-      } catch { }
+      } catch {}
       handleRef.current = null;
       setHandleInfo(null);
       setHandleLog('');
@@ -880,7 +873,9 @@ function DownloadTaskSection() {
         try {
           const state = taskRef.current!.savable();
           setSavedState(state);
-        } catch { /* not in paused state yet */ }
+        } catch {
+          /* not in paused state yet */
+        }
         setResultInfo('Paused again');
       }
     } catch (e: any) {
@@ -897,7 +892,10 @@ function DownloadTaskSection() {
     setResultInfo('');
     const abortController = new AbortController();
     abortControllerRef.current = abortController;
-    const task = DownloadTask.fromSavable(savedState, { onProgress, signal: abortController.signal });
+    const task = DownloadTask.fromSavable(savedState, {
+      onProgress,
+      signal: abortController.signal,
+    });
     taskRef.current = task;
     setTaskState(task.state);
     try {
@@ -961,9 +959,7 @@ function DownloadTaskSection() {
       {taskState ? <MonoText>State: {taskState}</MonoText> : null}
       {progress ? <MonoText>Progress: {progress}</MonoText> : null}
       {resultInfo ? <MonoText>{resultInfo}</MonoText> : null}
-      {savedState ? (
-        <MonoText>Saved state: {JSON.stringify(savedState, null, 2)}</MonoText>
-      ) : null}
+      {savedState ? <MonoText>Saved state: {JSON.stringify(savedState, null, 2)}</MonoText> : null}
     </>
   );
 }
