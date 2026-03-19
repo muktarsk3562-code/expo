@@ -6,7 +6,6 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.remember
-import expo.modules.kotlin.functions.Coroutine
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import expo.modules.kotlin.viewevent.getValue
@@ -71,16 +70,18 @@ class ExpoUIModule : Module() {
 
     View(RNHostView::class)
 
-    View(TextInputView::class) {
-      Events("onValueChanged")
-      Prop("defaultValue", "") { view: TextInputView, text: String ->
-        if (view.text == null) {
-          view.text = text
-        }
+    ExpoUIView(
+      "TextInputView",
+      events = {
+        Events("onValueChanged")
+      },
+      functions = {
+        AsyncFunction<String>("setText")
       }
-      AsyncFunction("setText") { view: TextInputView, text: String ->
-        view.text = text
-      }
+    ) { props: TextInputProps ->
+      val onSetText = AsyncFunctionHandler<String>("setText")
+      val onValueChanged by remember { EventDispatcher<Map<String, Any?>>() }
+      TextInputContent(props, onSetText) { value -> onValueChanged(mapOf("value" to value)) }
     }
 
     View(SlotView::class) {
@@ -93,11 +94,18 @@ class ExpoUIModule : Module() {
 
     //region Expo UI views
 
-    View(ModalBottomSheetView::class) {
-      Events("onDismissRequest")
-      AsyncFunction("hide") Coroutine { view: ModalBottomSheetView ->
-        view.hide()
+    ExpoUIView(
+      "ModalBottomSheetView",
+      events = {
+        Events("onDismissRequest")
+      },
+      functions = {
+        AsyncFunction("hide")
       }
+    ) { props: ModalBottomSheetViewProps ->
+      val onHide = AsyncFunctionHandler("hide")
+      val onDismissRequest by remember { EventDispatcher<Unit>() }
+      ModalBottomSheetContent(props, onHide) { onDismissRequest(Unit) }
     }
 
     ExpoUIView("SingleChoiceSegmentedButtonRowView") { props: SingleChoiceSegmentedButtonRowProps ->
