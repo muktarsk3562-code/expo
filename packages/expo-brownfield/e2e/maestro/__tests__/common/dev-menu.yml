@@ -28,6 +28,8 @@ appId: ${APP_ID}
 - assertVisible: "expo-app"
 - assertVisible: "Runtime version: exposdk:55.0.0"
 
+- scroll:
+    direction: DOWN
 - scrollUntilVisible:
     element:
       text: "Copy system info"
