@@ -39,8 +39,6 @@ import expo.modules.devlauncher.launcher.manifest.DevLauncherManifestParser
 import expo.modules.devlauncher.react.activitydelegates.DevLauncherReactActivityNOPDelegate
 import expo.modules.devlauncher.react.activitydelegates.DevLauncherReactActivityRedirectDelegate
 import expo.modules.devlauncher.services.DependencyInjection
-import expo.modules.devlauncher.services.PackagerService
-import expo.modules.devlauncher.services.inject
 import expo.modules.kotlin.weak
 import expo.modules.manifests.core.Manifest
 import expo.modules.updatesinterface.UpdatesInterface
@@ -49,7 +47,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
-import java.net.URI
 
 private const val NEW_ACTIVITY_FLAGS = Intent.FLAG_ACTIVITY_NEW_TASK or
   Intent.FLAG_ACTIVITY_CLEAR_TASK or
@@ -236,6 +233,8 @@ class DevLauncherController private constructor(
   }
 
   override fun handleIntent(intent: Intent?, activityToBeInvalidated: ReactActivity?): Boolean {
+    val defaultLaunchUri = getMetadataValue(context, "DEV_CLIENT_DEFAULT_LAUNCHER_URI", "").toUri()
+    val useDefaultLaunchUriFallback = defaultLaunchUri.toString() != ""
     intent
       ?.data
       ?.let { uri ->
@@ -252,6 +251,17 @@ class DevLauncherController private constructor(
         if (!hasUrlQueryParam(uri)) {
           // edge case: this is a dev launcher url but it does not specify what url to open
           // fallback to navigating to the launcher home screen
+
+          if (useDefaultLaunchUriFallback) {
+            coroutineScope.launch {
+              try {
+                loadApp(defaultLaunchUri, activityToBeInvalidated)
+              } catch (_: Throwable) {
+                navigateToLauncher()
+              }
+            }
+            return true
+          }
           navigateToLauncher()
           return true
         }
@@ -275,8 +285,6 @@ class DevLauncherController private constructor(
 
       val shouldTryToLaunchLastOpenedBundle = getMetadataValue(context, "DEV_CLIENT_TRY_TO_LAUNCH_LAST_BUNDLE", "true").toBoolean()
       val lastOpenedApp = recentlyOpedAppsRegistry.getMostRecentApp()
-      val defaultLaunchUri = getMetadataValue(context, "DEV_CLIENT_DEFAULT_LAUNCHER_URI", "").toUri()
-      val useDefaultLaunchUriFallback = defaultLaunchUri.toString() != ""
       if (shouldTryToLaunchLastOpenedBundle && lastOpenedApp != null) {
         coroutineScope.launch {
           try {

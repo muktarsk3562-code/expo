@@ -92,27 +92,34 @@ const withLocalNetworkPermission = (config) => {
 };
 exports.default = (0, config_plugins_1.createRunOncePlugin)((config, props = {}) => {
     (0, pluginConfig_1.validateConfig)(props);
+    const defaultLauncherURI = props.defaultLaunchURI;
     const iOSLaunchMode = props.ios?.launchMode ??
         props.launchMode ??
         props.ios?.launchModeExperimental ??
         props.launchModeExperimental;
-    if (iOSLaunchMode === 'launcher') {
-        config = (0, config_plugins_1.withInfoPlist)(config, (config) => {
+    config = (0, config_plugins_1.withInfoPlist)(config, (config) => {
+        if (iOSLaunchMode === 'launcher') {
             config.modResults['DEV_CLIENT_TRY_TO_LAUNCH_LAST_BUNDLE'] = false;
-            return config;
-        });
-    }
+        }
+        if (defaultLauncherURI) {
+            config.modResults['DEV_CLIENT_DEFAULT_LAUNCHER_URI'] = defaultLauncherURI;
+        }
+        return config;
+    });
     const androidLaunchMode = props.android?.launchMode ??
         props.launchMode ??
         props.android?.launchModeExperimental ??
         props.launchModeExperimental;
-    if (androidLaunchMode === 'launcher') {
-        config = (0, config_plugins_1.withAndroidManifest)(config, (config) => {
-            const mainApplication = config_plugins_1.AndroidConfig.Manifest.getMainApplicationOrThrow(config.modResults);
+    config = (0, config_plugins_1.withAndroidManifest)(config, (config) => {
+        const mainApplication = config_plugins_1.AndroidConfig.Manifest.getMainApplicationOrThrow(config.modResults);
+        if (androidLaunchMode === 'launcher') {
             config_plugins_1.AndroidConfig.Manifest.addMetaDataItemToMainApplication(mainApplication, 'DEV_CLIENT_TRY_TO_LAUNCH_LAST_BUNDLE', false?.toString());
-            return config;
-        });
-    }
+        }
+        if (defaultLauncherURI) {
+            config_plugins_1.AndroidConfig.Manifest.addMetaDataItemToMainApplication(mainApplication, 'DEV_CLIENT_DEFAULT_LAUNCHER_URI', defaultLauncherURI);
+        }
+        return config;
+    });
     config = withLocalNetworkPermission(config);
     config = withStripLocalNetworkKeysForRelease(config);
     return config;
