@@ -7,14 +7,14 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- An NSObject acting as a fake UIView for RCTMountingManager to represent a SwiftUI view.
- +allocWithZone: over-allocates memory so that if this view is incorrectly inserted into
- a UIKit hierarchy (missing `<Host>`), UIView ivar access hits valid zeroed memory instead
- of crashing. In dev mode, a graceful RCTLogError is shown.
+ A UIView-based variant of SwiftUIVirtualViewObjC used in dev mode.
+ Because it inherits from UIView, `insertSubview:` won't crash even when
+ the component is incorrectly placed without a `<Host>` wrapper.
+ `didMoveToSuperview` emits an RCTLogError to alert the developer.
  */
-@interface SwiftUIVirtualViewObjC : NSObject
+@interface SwiftUIVirtualViewObjCDev : UIView
 
-@property (nonatomic) NSInteger tag;
+// `tag` is inherited from UIView
 @property (nonatomic, copy, nullable) NSString *componentName;
 
 - (void)dispatchEvent:(nonnull NSString *)eventName payload:(nullable id)payload;
@@ -32,14 +32,12 @@ NS_ASSUME_NONNULL_BEGIN
 /*
  * Called for mounting (attaching) a child component view inside `self` component view.
  */
-- (void)mountChildComponentView:(nonnull UIView *)childComponentView index:(NSInteger)index NS_SWIFT_UI_ACTOR;
+- (void)mountChildComponentView:(nonnull UIView *)childComponentView index:(NSInteger)index;
 
 /*
  * Called for unmounting (detaching) a child component view from `self` component view.
  */
-- (void)unmountChildComponentView:(nonnull UIView *)childComponentView index:(NSInteger)index NS_SWIFT_UI_ACTOR;
-
-- (void)removeFromSuperview NS_SWIFT_UI_ACTOR;
+- (void)unmountChildComponentView:(nonnull UIView *)childComponentView index:(NSInteger)index;
 
 @end
 
