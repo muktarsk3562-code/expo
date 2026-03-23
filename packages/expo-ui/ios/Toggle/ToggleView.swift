@@ -8,6 +8,7 @@ internal final class ToggleProps: UIBaseViewProps {
   @Field var isOn: Bool?
   @Field var label: String?
   @Field var systemImage: String?
+  @Field var onIsOnChangeSync: WorkletCallback?
   var onIsOnChange = EventDispatcher()
 }
 
@@ -21,7 +22,7 @@ internal struct ToggleView: ExpoSwiftUI.View {
 
   var body: some View {
     if let state = props.state {
-      StatefulToggle(state: state, props: props)
+      StatefulToggle(state: state, props: props, children: Children())
     } else {
       makeToggle()
         .onChange(of: checked) { newValue in
@@ -55,15 +56,27 @@ internal struct ToggleView: ExpoSwiftUI.View {
 
 // MARK: - State-observed toggle
 
-private struct StatefulToggle: View {
+private struct StatefulToggle<Children: View>: View {
   @ObservedObject var state: ToggleState
   @ObservedObject var props: ToggleProps
+  let children: Children
 
   var body: some View {
+    makeToggle()
+      .onChange(of: state.isOn) { newValue in
+        props.onIsOnChange(["isOn": newValue])
+        props.onIsOnChangeSync?.invoke(arguments: [newValue])
+      }
+  }
+
+  @ViewBuilder
+  private func makeToggle() -> some View {
     if let systemImage = props.systemImage, let label = props.label {
       Toggle(label, systemImage: systemImage, isOn: $state.isOn)
+    } else if let label = props.label {
+      Toggle(label, isOn: $state.isOn)
     } else {
-      Toggle(props.label ?? "", isOn: $state.isOn)
+      Toggle(isOn: $state.isOn) { children }
     }
   }
 }

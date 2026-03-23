@@ -25,6 +25,22 @@ export type ToggleProps = {
      */
     onIsOnChange?: (isOn: boolean) => void;
     /**
+     * A worklet callback that runs synchronously on the UI thread when the toggle changes.
+     * Must be marked with the `'worklet'` directive.
+     *
+     * @example
+     * ```tsx
+     * <Toggle
+     *   state={state}
+     *   onIsOnChangeSync={(isOn) => {
+     *     'worklet';
+     *     console.log('UI thread:', isOn);
+     *   }}
+     * />
+     * ```
+     */
+    onIsOnChangeSync?: (isOn: boolean) => void;
+    /**
      * Custom content for the toggle label. Use multiple `Text` views where
      * the first represents the title and the second represents the subtitle.
      */
