@@ -4,6 +4,7 @@ import { type SFSymbol } from 'sf-symbols-typescript';
 
 import { createViewModifierEventListener } from '../modifiers/utils';
 import { getStateId } from '../State';
+import { useWorkletProp } from '../State/worklet';
 import { type ToggleState } from './state';
 import { type CommonViewModifierProps } from '../types';
 
@@ -31,14 +32,20 @@ export type ToggleProps = {
    */
   onIsOnChange?: (isOn: boolean) => void;
   /**
+   * A worklet callback that runs synchronously on the UI thread when the toggle changes.
+   * Must be marked with the `'worklet'` directive.
+   */
+  onIsOnChangeSync?: (isOn: boolean) => void;
+  /**
    * Custom content for the toggle label. Use multiple `Text` views where
    * the first represents the title and the second represents the subtitle.
    */
   children?: React.ReactNode;
 } & CommonViewModifierProps;
 
-type NativeToggleProps = Omit<ToggleProps, 'onIsOnChange' | 'state'> & {
+type NativeToggleProps = Omit<ToggleProps, 'onIsOnChange' | 'onIsOnChangeSync' | 'state'> & {
   state?: number;
+  onIsOnChangeSync?: number;
   onIsOnChange: (event: NativeSyntheticEvent<{ isOn: boolean }>) => void;
 };
 
@@ -51,11 +58,13 @@ const ToggleNativeView: React.ComponentType<NativeToggleProps> = requireNativeVi
  * A control that toggles between on and off states.
  */
 export function Toggle(props: ToggleProps) {
-  const { children, onIsOnChange, state, modifiers, ...restProps } = props;
+  const { children, onIsOnChange, onIsOnChangeSync, state, modifiers, ...restProps } = props;
+  const workletCallback = useWorkletProp(onIsOnChangeSync);
 
   const baseProps = {
     ...restProps,
     state: getStateId(state),
+    onIsOnChangeSync: getStateId(workletCallback),
     modifiers,
     ...(modifiers ? createViewModifierEventListener(modifiers) : undefined),
     onIsOnChange: ({ nativeEvent: { isOn } }: NativeSyntheticEvent<{ isOn: boolean }>) => {

@@ -1,6 +1,7 @@
 // Copyright 2025-present 650 Industries. All rights reserved.
 
 import ExpoModulesCore
+import ExpoModulesWorklets
 
 public final class ExpoUIModule: Module {
   public func definition() -> ModuleDefinition {
@@ -15,6 +16,14 @@ public final class ExpoUIModule: Module {
     }
 
     // MARK: - Observable State Classes
+
+    Class(WorkletCallback.self) {
+      Constructor { (worklet: Worklet) -> WorkletCallback in
+        let callback = WorkletCallback()
+        callback.worklet = worklet
+        return callback
+      }
+    }
 
     Class(ToggleState.self) {
       Constructor { (initialValue: Bool) -> ToggleState in
