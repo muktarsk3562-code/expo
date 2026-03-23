@@ -1,6 +1,6 @@
-import { Button, Host, List, Section, Text, Toggle } from '@expo/ui/swift-ui';
+import { Button, Host, List, Section, Text, Toggle, useToggleState } from '@expo/ui/swift-ui';
 import { labelsHidden, tint, toggleStyle } from '@expo/ui/swift-ui/modifiers';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function ToggleScreen() {
   const [airplaneMode, setAirplaneMode] = useState(false);
@@ -46,7 +46,35 @@ export default function ToggleScreen() {
         <Section title="Hidden Label">
           <Toggle label="Hidden Label" modifiers={[labelsHidden()]} />
         </Section>
+        <Section title="Shared State">
+          <SharedStateToggle />
+        </Section>
       </List>
     </Host>
+  );
+}
+
+/**
+ * Demonstrates using `useToggleState` to create a native ObservableState
+ * that drives the Toggle directly on the Swift side — no `isOn` / `onIsOnChange` needed.
+ * JS can still read/write `state.isOn` and listen for changes.
+ */
+function SharedStateToggle() {
+  const state = useToggleState(false);
+  const [log, setLog] = useState('');
+
+  useEffect(() => {
+    const subscription = state.addListener('isOnChange', ({ isOn }) => {
+      setLog(`Changed to: ${isOn}`);
+    });
+    return () => subscription.remove();
+  }, [state]);
+
+  return (
+    <>
+      <Toggle state={state} label="Shared State Toggle" />
+      <Text>{log}</Text>
+      <Button label="Toggle from JS" onPress={() => (state.isOn = !state.isOn)} />
+    </>
   );
 }

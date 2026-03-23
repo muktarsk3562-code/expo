@@ -208,6 +208,14 @@ public final class AppContext: NSObject, @unchecked Sendable {
   internal lazy var sharedObjectRegistry = SharedObjectRegistry(appContext: self)
 
   /**
+   Looks up a native shared object by its ID in the registry.
+   Returns `nil` if no object with the given ID exists or if it cannot be cast to the expected type.
+   */
+  public func findNativeSharedObject<T: SharedObject>(byId id: SharedObjectId) -> T? {
+    return sharedObjectRegistry.get(id)?.native as? T
+  }
+
+  /**
    A registry containing references to JavaScript classes.
    - ToDo: Make one registry per module, not the entire app context.
    Perhaps it should be kept by the `ModuleHolder`.

@@ -42,3 +42,4 @@ export * from './Grid';
 export * from './RNHostView';
 export * from './Link';
 export { type CommonViewModifierProps } from './types';
+export * from './State';

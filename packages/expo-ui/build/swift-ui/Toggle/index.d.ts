@@ -1,6 +1,15 @@
 import { type SFSymbol } from 'sf-symbols-typescript';
+import { type ToggleState } from '../State';
 import { type CommonViewModifierProps } from '../types';
 export type ToggleProps = {
+    /**
+     * An observable state object that drives the toggle.
+     * When provided, the toggle reads and writes `state.isOn` directly
+     * through the native SharedObject — no `isOn` / `onIsOnChange` props needed.
+     *
+     * Create one with `useToggleState()`.
+     */
+    state?: ToggleState;
     /**
      * A Boolean value that determines the on/off state of the toggle.
      */
