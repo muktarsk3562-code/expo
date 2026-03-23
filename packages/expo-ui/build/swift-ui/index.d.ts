@@ -42,4 +42,5 @@ export * from './Grid';
 export * from './RNHostView';
 export * from './Link';
 export { type CommonViewModifierProps } from './types';
+export { registerSharedObjectSerializer } from './State';
 //# sourceMappingURL=index.d.ts.map

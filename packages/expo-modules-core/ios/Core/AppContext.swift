@@ -536,8 +536,81 @@ public final class AppContext: NSObject, @unchecked Sendable {
     // Install `global.expo.EventEmitter`.
     EXJavaScriptRuntimeManager.installEventEmitterClass(uiRuntime)
 
+    // Install `global.expo.SharedObject`.
+    EXJavaScriptRuntimeManager.installSharedObjectClass(uiRuntime) { [weak sharedObjectRegistry] objectId in
+      sharedObjectRegistry?.delete(objectId)
+    }
+
+    // Install `global.expo.SharedRef`.
+    EXJavaScriptRuntimeManager.installSharedRefClass(uiRuntime)
+
     // Install `global.expo.NativeModule`.
     EXJavaScriptRuntimeManager.installNativeModuleClass(uiRuntime)
+
+    // Install module class prototypes so SharedObject properties are accessible in worklets.
+    try installModuleClasses(in: uiRuntime)
+  }
+
+  /**
+   Installs SharedObject class prototypes with property getter/setters in the given runtime.
+   Also installs `SharedObject.__resolveInWorklet(className, objectId)` for resolving the original native object instance in worklets.
+   */
+  @MainActor
+  private func installModuleClasses(in runtime: JavaScriptRuntime) throws {
+    let coreObject = runtime.global().getProperty(EXGlobalCoreObjectPropertyName).getObject()
+    let sharedObjectClass = coreObject.getProperty("SharedObject").getObject()
+    let sharedObjectBaseProto = sharedObjectClass.getProperty("prototype").getObject()
+
+    var protoCache: [ObjectIdentifier: JavaScriptObject] = [:]
+
+    // Called by the worklet serializer's `unpack` to recreate a SharedObject proxy.
+    // Takes just the objectId — looks up the native type, lazily builds the prototype on first use.
+    sharedObjectClass.setProperty("__resolveInWorklet", value: runtime.createSyncFunction(
+      "__resolveInWorklet",
+      argsCount: 1
+    ) { [weak self] _, arguments in
+      guard let self else { throw Exceptions.AppContextLost() }
+
+      let objectId = try arguments[0].asInt()
+
+      guard let nativeObject = self.sharedObjectRegistry.get(objectId)?.native else {
+        throw SharedObjectClassNotFoundException(String(objectId))
+      }
+
+      let typeId = ObjectIdentifier(type(of: nativeObject))
+
+      if protoCache[typeId] == nil {
+        let classDefinition = self.findClassDefinition(for: typeId)
+        protoCache[typeId] = try classDefinition?.buildPrototype(
+          in: runtime, appContext: self, basePrototype: sharedObjectBaseProto
+        )
+      }
+
+      guard let classProto = protoCache[typeId] else {
+        throw SharedObjectClassNotFoundException(String(describing: type(of: nativeObject)))
+      }
+      guard let instance = runtime.createObject(withPrototype: classProto) else {
+        throw SharedObjectClassNotFoundException(String(describing: type(of: nativeObject)))
+      }
+
+      instance.defineProperty(sharedObjectIdPropertyName, value: objectId, options: [])
+      return runtime.value(from: instance)
+    })
+  }
+
+  /**
+   Finds the ClassDefinition for a given native type identifier by searching all modules.
+   */
+  private func findClassDefinition(for typeId: ObjectIdentifier) -> ClassDefinition? {
+    for module in moduleRegistry {
+      for (_, classDefinition) in module.definition.classes {
+        if let sharedObjectType = classDefinition.associatedType as? DynamicSharedObjectType,
+           sharedObjectType.typeIdentifier == typeId {
+          return classDefinition
+        }
+      }
+    }
+    return nil
   }
 
   /**
@@ -622,6 +695,12 @@ public final class AppContext: NSObject, @unchecked Sendable {
 public class JavaScriptClassNotFoundException: Exception, @unchecked Sendable {
   public override var reason: String {
     "Unable to find a JavaScript class in the class registry"
+  }
+}
+
+internal final class SharedObjectClassNotFoundException: GenericException<String>, @unchecked Sendable {
+  override var reason: String {
+    "SharedObject class '\(param)' is not registered in the worklet runtime"
   }
 }
 
