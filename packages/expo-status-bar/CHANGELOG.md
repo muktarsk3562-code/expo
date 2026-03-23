@@ -4,6 +4,8 @@
 
 ### 🛠 Breaking changes
 
+- Removed deprecated `backgroundColor`, `networkActivityIndicatorVisible` and `translucent` props, as well as the `setStatusBarBackgroundColor`, `setStatusBarNetworkActivityIndicatorVisible` and `setStatusBarTranslucent` functions. ([#44172](https://github.com/expo/expo/pull/44172) by [@zoontek](https://github.com/zoontek))
+
 ### 🎉 New features
 
 - Added config plugin for Android and iOS status bar configuration. ([#43968](https://github.com/expo/expo/pull/43968) by [@zoontek](https://github.com/zoontek))
@@ -11,6 +13,8 @@
 ### 🐛 Bug fixes
 
 ### 💡 Others
+
+- Moved `setStatusBarStyle` and `setStatusBarHidden` to `StatusBar.setStyle` and `StatusBar.setHidden` static methods. The old named exports are still available but deprecated. ([#44172](https://github.com/expo/expo/pull/44172) by [@zoontek](https://github.com/zoontek))
 
 ## 55.0.4 — 2026-02-25
 
