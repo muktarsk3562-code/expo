@@ -485,6 +485,13 @@ export const ScreensList: ScreenConfig[] = [
   },
   {
     getComponent() {
+      return optionalRequire(() => require('../screens/RustModuleScreen'));
+    },
+    name: 'RustModule',
+    options: { title: 'Rust JSI Module' },
+  },
+  {
+    getComponent() {
       return optionalRequire(() => require('../screens/ViewShotScreen'));
     },
     name: 'ViewShot',
