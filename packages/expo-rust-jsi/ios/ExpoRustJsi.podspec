@@ -33,6 +33,11 @@ Pod::Spec.new do |s|
       '"${PODS_TARGET_SRCROOT}/../target/*/release/build/expo-rust-jsi-*/out/cxxbridge/include"',
       '"${PODS_TARGET_SRCROOT}/../target/*/release/build/expo-rust-jsi-*/out/cxxbridge/crate"',
     ].join(' '),
+  }
+
+  # Linker flags must be on the app target (user_target_xcconfig), not just
+  # the pod target, because the Rust static library is linked into the final binary.
+  s.user_target_xcconfig = {
     'OTHER_LDFLAGS' => '-lresolv -lexpo_rust_jsi',
     'LIBRARY_SEARCH_PATHS' => '"${BUILT_PRODUCTS_DIR}"',
   }
