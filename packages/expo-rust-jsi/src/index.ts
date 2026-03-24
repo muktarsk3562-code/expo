@@ -4,23 +4,21 @@ import type { RustMathModule } from './RustMath';
 import type { RustStringModule } from './RustString';
 
 /**
- * ExpoRustJsi is the loader module. Importing it triggers the installation
- * of all Rust-defined modules onto the JSI runtime. Individual Rust modules
- * (RustMath, RustString) must be required *after* this initialization.
+ * ExpoRustJsi is the loader module. Calling install() triggers the Rust
+ * entry point that registers RustMath and RustString on globalThis.expo.modules.
  *
- * NOTE: The RustMath/RustString requires are intentionally in this file
- * rather than re-exported from their own files, because ES module import
- * hoisting would cause those files to evaluate before ExpoRustJsi is
- * initialized, resulting in "cannot find native module" errors.
+ * We use an explicit install() call rather than OnCreate because OnCreate fires
+ * during module instantiation — before the JSI runtime is available on AppContext.
+ * Function bodies are only called after the runtime is ready.
  */
-const ExpoRustJsi = requireNativeModule('ExpoRustJsi');
+const ExpoRustJsi = requireNativeModule<{ install(): void }>('ExpoRustJsi');
+ExpoRustJsi.install();
 
-export default ExpoRustJsi;
-
-// These calls are safe here because the line above already ran expo_rust_jsi_install,
-// which registered RustMath and RustString on globalThis.expo.modules.
+// Now that expo_rust_jsi_install has run, the Rust modules are registered.
 export const RustMath = requireNativeModule<RustMathModule>('RustMath');
 export const RustString = requireNativeModule<RustStringModule>('RustString');
+
+export default ExpoRustJsi;
 
 // Re-export types for consumers
 export type { RustMathModule } from './RustMath';

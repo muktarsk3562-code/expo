@@ -6,12 +6,10 @@ import expo.modules.kotlin.modules.ModuleDefinition
 /**
  * Expo module that loads and initializes Rust-based JSI modules.
  *
- * This module acts as a bridge: it loads the native shared library containing
- * both the C++ shim and the Rust static library, then calls into Rust to
- * install modules directly onto the JSI runtime.
- *
- * The Rust modules register themselves into `expo.modules[name]` just like
- * Kotlin/Swift modules do, so they're accessible via `requireNativeModule()`.
+ * The install is exposed as an explicit Function rather than using OnCreate,
+ * because OnCreate fires during module instantiation — before the JSI runtime
+ * is guaranteed to be available. The JS layer calls install() synchronously
+ * on import.
  */
 class ExpoRustJsiModule : Module() {
     companion object {
@@ -23,11 +21,9 @@ class ExpoRustJsiModule : Module() {
     override fun definition() = ModuleDefinition {
         Name("ExpoRustJsi")
 
-        OnCreate {
+        Function("install") {
             val runtime = appContext.runtime
-            if (runtime != null) {
-                nativeInstall(runtime.rawPointer)
-            }
+            nativeInstall(runtime.rawPointer)
         }
     }
 

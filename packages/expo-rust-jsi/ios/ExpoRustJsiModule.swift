@@ -2,18 +2,18 @@ import ExpoModulesCore
 
 /// Expo module that loads and initializes Rust-based JSI modules on iOS.
 ///
-/// This module calls into the Rust static library via an Objective-C++ shim
-/// to install Rust modules directly onto the JSI runtime.
+/// The install is exposed as an explicit Function rather than using OnCreate,
+/// because OnCreate fires during module instantiation — before the JSI runtime
+/// is set on AppContext. The JS layer calls install() synchronously on import.
 public class ExpoRustJsiModule: Module {
     public func definition() -> ModuleDefinition {
         Name("ExpoRustJsi")
 
-        OnCreate {
-            guard let runtime = try? self.appContext?.runtime else {
-                return
+        Function("install") {
+            guard let appContext else {
+                throw Exceptions.AppContextLost()
             }
-            // ExpoRustJsiInstall is defined in ExpoRustJsi.mm — it extracts
-            // the raw jsi::Runtime* and passes it to the Rust C entry point.
+            let runtime = try appContext.runtime
             ExpoRustJsiInstall(runtime)
         }
     }
