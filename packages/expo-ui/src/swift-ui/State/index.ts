@@ -61,13 +61,18 @@ export function registerSharedObjectSerializer(): void {
     pack: (value: any) => {
       'worklet';
       return {
-        className: value.constructor?.name ?? 'SharedObject',
+        moduleName: value.__expoModuleName,
+        className: value.__expoClassName ?? value.constructor?.name,
         objectId: value.__expo_shared_object_id__,
       };
     },
     unpack: (packed: any) => {
       'worklet';
-      return (globalThis as any).expo.SharedObject.__wrap(packed.className, packed.objectId);
+      return (globalThis as any).expo.SharedObject.__wrap(
+        packed.moduleName,
+        packed.className,
+        packed.objectId
+      );
     },
   });
 }

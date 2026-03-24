@@ -561,7 +561,8 @@ public final class AppContext: NSObject, @unchecked Sendable {
     let sharedObjectClass = coreObject.getProperty("SharedObject").getObject()
     let sharedObjectBaseProto = sharedObjectClass.getProperty("prototype").getObject()
 
-    var protoMap: [String: JavaScriptObject] = [:]
+    // Nested dictionary: [moduleName: [className: prototype]]
+    var protoMap: [String: [String: JavaScriptObject]] = [:]
 
     for module in moduleRegistry {
       for (_, classDefinition) in module.definition.classes {
@@ -573,21 +574,23 @@ public final class AppContext: NSObject, @unchecked Sendable {
         ) else {
           continue
         }
-        protoMap[classDefinition.name] = proto
+        proto.defineProperty("__expoModuleName", value: module.name, options: [])
+        proto.defineProperty("__expoClassName", value: classDefinition.name, options: [])
+        protoMap[module.name, default: [:]][classDefinition.name] = proto
       }
     }
 
-    // Install SharedObject.__wrap(className, objectId) — creates a proxy instance
-    // with the right prototype + NativeState for property access.
+    // Called by the worklet serializer's `unpack` in worklet runtime to recreate the SharedObject instance
     sharedObjectClass.setProperty("__wrap", value: runtime.createSyncFunction(
       "__wrap",
-      argsCount: 2
+      argsCount: 3
     ) { [protoMap] _, arguments in
-      let className = try arguments[0].asString()
-      let objectId = try arguments[1].asInt()
+      let moduleName = try arguments[0].asString()
+      let className = try arguments[1].asString()
+      let objectId = try arguments[2].asInt()
 
-      guard let classProto = protoMap[className] else {
-        throw SharedObjectClassNotFoundException(className)
+      guard let classProto = protoMap[moduleName]?[className] else {
+        throw SharedObjectClassNotFoundException("\(moduleName).\(className)")
       }
       guard let instance = try runtime.createObject(withPrototype: classProto) else {
         throw SharedObjectClassNotFoundException(className)
