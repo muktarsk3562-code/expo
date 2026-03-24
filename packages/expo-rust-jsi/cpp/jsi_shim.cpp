@@ -167,7 +167,7 @@ Value ffi_to_jsi_value(Runtime& rt, const FfiValue& value) {
 
 FfiValue jsi_create_object(const RuntimeHandle& rth) {
   auto& rt = rt_from_handle(rth);
-  auto obj = std::make_shared<Object>(rt.createObject());
+  auto obj = std::make_shared<Object>(rt);
   FfiValue v;
   v.kind = ValueKind::Object;
   v.bool_val = false;
@@ -200,7 +200,7 @@ FfiValue jsi_object_get_property(const RuntimeHandle& rth, uint64_t obj_handle,
 
 FfiValue jsi_create_array(const RuntimeHandle& rth, uint32_t length) {
   auto& rt = rt_from_handle(rth);
-  auto arr = std::make_shared<Object>(rt.createArray(length));
+  auto arr = std::make_shared<Object>(Array(rt, length));
   FfiValue v;
   v.kind = ValueKind::Array;
   v.bool_val = false;
@@ -329,7 +329,7 @@ FfiValue jsi_create_promise(const RuntimeHandle& rth) {
 
   // Return an object with { promise, resolve, reject } handles encoded
   // We pack them into a single FfiValue using an object
-  auto result_obj = std::make_shared<Object>(rt.createObject());
+  auto result_obj = std::make_shared<Object>(rt);
   result_obj->setProperty(rt, "promise",
     Value(static_cast<double>(promise_handle)));
   result_obj->setProperty(rt, "resolve",
@@ -421,7 +421,7 @@ void jsi_register_module(const RuntimeHandle& rth, rust::Str name,
     container = container_val.getObject(rt);
   } else {
     fprintf(stderr, "[ExpoRustJsi/C++]   creating new __ExpoRustJsiModules\n");
-    container = rt.createObject();
+    container = Object(rt);
     rt.global().setProperty(rt, "__ExpoRustJsiModules", container);
   }
 
