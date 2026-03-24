@@ -35,7 +35,8 @@ Pod::Spec.new do |s|
       '"${PODS_TARGET_SRCROOT}/target/*/release/build/expo-rust-jsi-*/out/cxxbridge/include"',
       '"${PODS_TARGET_SRCROOT}/target/*/release/build/expo-rust-jsi-*/out/cxxbridge/crate"',
     ].join(' '),
-    'OTHER_LDFLAGS' => '-lresolv',
+    'OTHER_LDFLAGS' => '-lresolv -lexpo_rust_jsi',
+    'LIBRARY_SEARCH_PATHS' => '"${BUILT_PRODUCTS_DIR}"',
     'SWIFT_OBJC_BRIDGING_HEADER' => '${PODS_TARGET_SRCROOT}/ios/ExpoRustJsi-Bridging-Header.h',
   }
 
@@ -67,5 +68,4 @@ Pod::Spec.new do |s|
     execution_position: :before_compile,
   }
 
-  s.vendored_libraries = 'target/*/release/libexpo_rust_jsi.a'
 end
