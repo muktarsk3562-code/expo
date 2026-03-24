@@ -34,7 +34,6 @@ Pod::Spec.new do |s|
     ].join(' '),
     'OTHER_LDFLAGS' => '-lresolv -lexpo_rust_jsi',
     'LIBRARY_SEARCH_PATHS' => '"${BUILT_PRODUCTS_DIR}"',
-    'SWIFT_OBJC_BRIDGING_HEADER' => '${PODS_TARGET_SRCROOT}/ExpoRustJsi-Bridging-Header.h',
   }
 
   # Build Rust library as part of the Xcode build.
