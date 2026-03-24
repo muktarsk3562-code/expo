@@ -83,6 +83,14 @@ export const UIScreens = [
     },
   },
   {
+    name: 'ExposedDropdownMenuPicker component',
+    route: 'ui/exposed-dropdown-menu-picker',
+    options: {},
+    getComponent() {
+      return optionalRequire(() => require('./ExposedDropdownMenuPickerScreen'));
+    },
+  },
+  {
     name: 'Community DateTimePicker replacement',
     route: 'ui/community-datetimepicker',
     options: {},
