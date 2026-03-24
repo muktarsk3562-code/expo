@@ -320,7 +320,7 @@ FfiValue jsi_create_promise(const RuntimeHandle& rth) {
   if (!promise_ctor_val.isObject()) {
     return jsi_make_undefined();
   }
-  Object promise_ctor = promise_ctor_val.getObject(rt);
+  Function promise_ctor = promise_ctor_val.getObject(rt).getFunction(rt);
   Value promise_val = promise_ctor.callAsConstructor(rt, executor);
 
   // Store the promise object
@@ -415,15 +415,14 @@ void jsi_register_module(const RuntimeHandle& rth, rust::Str name,
   // cannot set properties on it directly.  Instead, install Rust modules on a
   // dedicated global: global.__ExpoRustJsiModules.
   Value container_val = rt.global().getProperty(rt, "__ExpoRustJsiModules");
-  Object container;
-  if (container_val.isObject()) {
-    fprintf(stderr, "[ExpoRustJsi/C++]   reusing existing __ExpoRustJsiModules\n");
-    container = container_val.getObject(rt);
-  } else {
+  if (!container_val.isObject()) {
     fprintf(stderr, "[ExpoRustJsi/C++]   creating new __ExpoRustJsiModules\n");
-    container = Object(rt);
-    rt.global().setProperty(rt, "__ExpoRustJsiModules", container);
+    rt.global().setProperty(rt, "__ExpoRustJsiModules", Object(rt));
+    container_val = rt.global().getProperty(rt, "__ExpoRustJsiModules");
+  } else {
+    fprintf(stderr, "[ExpoRustJsi/C++]   reusing existing __ExpoRustJsiModules\n");
   }
+  Object container = container_val.getObject(rt);
 
   auto obj = std::static_pointer_cast<Object>(HandleTable::instance().get(obj_handle));
   if (obj) {
