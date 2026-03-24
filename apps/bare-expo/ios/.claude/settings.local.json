@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/chrfalch/repos/expo/expo-scratch/packages/create-expo/**)",
+      "Bash(npx jest:*)"
+    ]
+  }
+}
