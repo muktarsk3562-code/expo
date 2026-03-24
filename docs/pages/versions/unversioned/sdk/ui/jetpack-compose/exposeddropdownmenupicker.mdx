@@ -1,0 +1,73 @@
+---
+title: ExposedDropdownMenuPicker
+description: A Jetpack Compose ExposedDropdownMenuBox component for displaying a read-only text field with an expandable dropdown menu.
+sourceCodeUrl: 'https://github.com/expo/expo/tree/main/packages/expo-ui'
+packageName: '@expo/ui'
+platforms: ['android']
+---
+
+import APISection from '~/components/plugins/APISection';
+import { APIInstallSection } from '~/components/plugins/InstallSection';
+
+Expo UI `ExposedDropdownMenuPicker` matches the official Jetpack Compose [`ExposedDropdownMenuBox`](https://kotlinlang.org/api/compose-multiplatform/material3/androidx.compose.material3/-exposed-dropdown-menu-box.html) and renders a read-only text field that expands into a dropdown menu.
+
+## Installation
+
+<APIInstallSection />
+
+## Usage
+
+### Basic
+
+```tsx BasicExposedDropdownMenuPickerExample.tsx
+import { DropdownMenuItem, ExposedDropdownMenuPicker, Host, Text } from '@expo/ui/jetpack-compose';
+import { useState } from 'react';
+
+const LANGUAGES = [
+  { label: 'Java', value: 'java' },
+  { label: 'JavaScript', value: 'js' },
+  { label: 'TypeScript', value: 'ts' },
+];
+
+export default function BasicExposedDropdownMenuPickerExample() {
+  const [selected, setSelected] = useState('java');
+  const [expanded, setExpanded] = useState(false);
+
+  const selectedLabel = LANGUAGES.find(l => l.value === selected)?.label ?? '';
+
+  return (
+    <Host matchContents>
+      <ExposedDropdownMenuPicker
+        value={selectedLabel}
+        expanded={expanded}
+        onExpandedChange={setExpanded}>
+        <ExposedDropdownMenuPicker.Items>
+          {LANGUAGES.map(lang => (
+            <DropdownMenuItem
+              key={lang.value}
+              onClick={() => {
+                setSelected(lang.value);
+                setExpanded(false);
+              }}>
+              <DropdownMenuItem.Text>
+                <Text>{lang.label}</Text>
+              </DropdownMenuItem.Text>
+            </DropdownMenuItem>
+          ))}
+        </ExposedDropdownMenuPicker.Items>
+      </ExposedDropdownMenuPicker>
+    </Host>
+  );
+}
+```
+
+## API
+
+```tsx
+import { ExposedDropdownMenuPicker } from '@expo/ui/jetpack-compose';
+```
+
+<APISection
+  packageName="expo-ui/jetpack-compose/exposeddropdownmenupicker"
+  apiName="ExposedDropdownMenuPicker"
+/>

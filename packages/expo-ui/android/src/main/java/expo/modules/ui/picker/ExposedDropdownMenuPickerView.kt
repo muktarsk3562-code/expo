@@ -17,6 +17,7 @@ import expo.modules.ui.ModifierList
 import expo.modules.ui.ModifierRegistry
 import expo.modules.ui.composeOrNull
 import expo.modules.ui.findChildSlotView
+import expo.modules.ui.renderSlot
 
 data class ExposedDropdownMenuPickerColors(
   // TextField text colors
@@ -102,13 +103,7 @@ fun FunctionalComposableScope.ExposedDropdownMenuPickerContent(
       onDismissRequest = { onExpandedChange(false) },
       containerColor = colors.menuContainerColor.composeOrNull ?: MenuDefaults.containerColor
     ) {
-      itemsSlotView?.let {
-        with(ComposableScope()) {
-          with(it) {
-            Content()
-          }
-        }
-      }
+      itemsSlotView?.renderSlot()
     }
   }
 }
