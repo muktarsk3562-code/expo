@@ -553,7 +553,7 @@ public final class AppContext: NSObject, @unchecked Sendable {
 
   /**
    Installs SharedObject class prototypes with property getter/setters in the given runtime.
-   Also installs `SharedObject.__wrap(className, objectId)` for creating proxies in worklets.
+   Also installs `SharedObject.__resolveInWorklet(className, objectId)` for resolving the original native object instance in worklets.
    */
   @MainActor
   private func installModuleClasses(in runtime: JavaScriptRuntime) throws {
@@ -561,44 +561,56 @@ public final class AppContext: NSObject, @unchecked Sendable {
     let sharedObjectClass = coreObject.getProperty("SharedObject").getObject()
     let sharedObjectBaseProto = sharedObjectClass.getProperty("prototype").getObject()
 
-    // Nested dictionary: [moduleName: [className: prototype]]
-    var protoMap: [String: [String: JavaScriptObject]] = [:]
+    var protoCache: [ObjectIdentifier: JavaScriptObject] = [:]
 
-    for module in moduleRegistry {
-      for (_, classDefinition) in module.definition.classes {
-        guard classDefinition.associatedType is DynamicSharedObjectType else {
-          continue
-        }
-        guard let proto = try classDefinition.buildPrototype(
+    // Called by the worklet serializer's `unpack` to recreate a SharedObject proxy.
+    // Takes just the objectId — looks up the native type, lazily builds the prototype on first use.
+    sharedObjectClass.setProperty("__resolveInWorklet", value: runtime.createSyncFunction(
+      "__resolveInWorklet",
+      argsCount: 1
+    ) { [weak self] _, arguments in
+      guard let self else { throw Exceptions.AppContextLost() }
+
+      let objectId = try arguments[0].asInt()
+
+      guard let nativeObject = self.sharedObjectRegistry.get(objectId)?.native else {
+        throw SharedObjectClassNotFoundException(String(objectId))
+      }
+
+      let typeId = ObjectIdentifier(type(of: nativeObject))
+
+      if protoCache[typeId] == nil {
+        let classDefinition = self.findClassDefinition(for: typeId)
+        protoCache[typeId] = try classDefinition?.buildPrototype(
           in: runtime, appContext: self, basePrototype: sharedObjectBaseProto
-        ) else {
-          continue
-        }
-        proto.defineProperty("__expoModuleName", value: module.name, options: [])
-        proto.defineProperty("__expoClassName", value: classDefinition.name, options: [])
-        protoMap[module.name, default: [:]][classDefinition.name] = proto
-      }
-    }
-
-    // Called by the worklet serializer's `unpack` in worklet runtime to recreate the SharedObject instance
-    sharedObjectClass.setProperty("__wrap", value: runtime.createSyncFunction(
-      "__wrap",
-      argsCount: 3
-    ) { [protoMap] _, arguments in
-      let moduleName = try arguments[0].asString()
-      let className = try arguments[1].asString()
-      let objectId = try arguments[2].asInt()
-
-      guard let classProto = protoMap[moduleName]?[className] else {
-        throw SharedObjectClassNotFoundException("\(moduleName).\(className)")
-      }
-      guard let instance = try runtime.createObject(withPrototype: classProto) else {
-        throw SharedObjectClassNotFoundException(className)
+        )
       }
 
-      SharedObjectUtils.setNativeState(instance, runtime: runtime, objectId: objectId) { _ in }
+      guard let classProto = protoCache[typeId] else {
+        throw SharedObjectClassNotFoundException(String(describing: type(of: nativeObject)))
+      }
+      guard let instance = runtime.createObject(withPrototype: classProto) else {
+        throw SharedObjectClassNotFoundException(String(describing: type(of: nativeObject)))
+      }
+
+      instance.defineProperty(sharedObjectIdPropertyName, value: objectId, options: [])
       return runtime.value(from: instance)
     })
+  }
+
+  /**
+   Finds the ClassDefinition for a given native type identifier by searching all modules.
+   */
+  private func findClassDefinition(for typeId: ObjectIdentifier) -> ClassDefinition? {
+    for module in moduleRegistry {
+      for (_, classDefinition) in module.definition.classes {
+        if let sharedObjectType = classDefinition.associatedType as? DynamicSharedObjectType,
+           sharedObjectType.typeIdentifier == typeId {
+          return classDefinition
+        }
+      }
+    }
+    return nil
   }
 
   /**
