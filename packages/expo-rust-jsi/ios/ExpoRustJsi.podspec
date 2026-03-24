@@ -17,9 +17,11 @@ Pod::Spec.new do |s|
 
   s.dependency 'ExpoModulesCore'
 
+  # Only compile Swift/ObjC++ wrapper files here. The C++ jsi_shim.cpp is
+  # compiled by cargo's build.rs (via cxx_build) and linked into the Rust
+  # static library. Including it here would create duplicate symbols.
   s.source_files = [
     '**/*.{swift,h,m,mm}',
-    '../cpp/**/*.{h,cpp}',
   ]
 
   # cxx-generated headers are under target/<target>/release/build/expo-rust-jsi-*/out/cxxbridge/
@@ -87,6 +89,10 @@ Pod::Spec.new do |s|
       else
         RUST_TARGET="aarch64-apple-ios"
       fi
+
+      # Tell the Rust build.rs where to find React-jsi headers so it
+      # compiles the real JSI bindings instead of standalone no-op stubs.
+      export JSI_INCLUDE_PATH="${PODS_ROOT}/Headers/Public/React-jsi"
 
       echo "Building Rust library for target: ${RUST_TARGET}"
       cargo build --release --target "${RUST_TARGET}" --lib

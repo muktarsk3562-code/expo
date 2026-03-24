@@ -65,6 +65,10 @@ android.defaultConfig.ndk.abiFilters.forEach { abi ->
             "--target", rustTarget,
             "--lib"
         )
+        // Tell Rust build.rs where JSI headers live so it compiles
+        // real JSI bindings instead of standalone no-op stubs.
+        val reactNativeDir = file("${project.projectDir}/../../react-native")
+        environment("JSI_INCLUDE_PATH", "${reactNativeDir}/ReactCommon/jsi")
 
         // Copy the output to where CMake expects it
         doLast {
