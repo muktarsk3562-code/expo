@@ -406,23 +406,22 @@ void jsi_register_module(const RuntimeHandle& rth, rust::Str name,
                          uint64_t obj_handle) {
   auto& rt = rt_from_handle(rth);
 
-  Value expo_val = rt.global().getProperty(rt, "expo");
-  if (!expo_val.isObject()) {
-    throw std::runtime_error("expo global not found - is expo-modules-core initialized?");
+  // expo.modules is a read-only HostObject managed by ExpoModulesCore, so we
+  // cannot set properties on it directly.  Instead, install Rust modules on a
+  // dedicated global: global.__ExpoRustJsiModules.
+  Value container_val = rt.global().getProperty(rt, "__ExpoRustJsiModules");
+  Object container;
+  if (container_val.isObject()) {
+    container = container_val.getObject(rt);
+  } else {
+    container = rt.createObject();
+    rt.global().setProperty(rt, "__ExpoRustJsiModules", container);
   }
 
-  Object expo_obj = expo_val.getObject(rt);
-  Value modules_val = expo_obj.getProperty(rt, "modules");
-  if (!modules_val.isObject()) {
-    throw std::runtime_error("expo.modules not found");
-  }
-
-  Object modules_obj = modules_val.getObject(rt);
   auto module_name = std::string(name.data(), name.size());
-
   auto obj = std::static_pointer_cast<Object>(HandleTable::instance().get(obj_handle));
   if (obj) {
-    modules_obj.setProperty(rt, module_name.c_str(), Value(rt, *obj));
+    container.setProperty(rt, module_name.c_str(), Value(rt, *obj));
   }
 }
 

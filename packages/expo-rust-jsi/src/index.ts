@@ -5,18 +5,32 @@ import type { RustStringModule } from './RustString';
 
 /**
  * ExpoRustJsi is the loader module. Calling install() triggers the Rust
- * entry point that registers RustMath and RustString on globalThis.expo.modules.
+ * entry point that registers RustMath and RustString on
+ * globalThis.__ExpoRustJsiModules.
  *
- * We use an explicit install() call rather than OnCreate because OnCreate fires
- * during module instantiation — before the JSI runtime is available on AppContext.
- * Function bodies are only called after the runtime is ready.
+ * We cannot use expo.modules for Rust modules because it is a read-only
+ * HostObject managed by ExpoModulesCore. Instead, Rust modules are installed
+ * on a dedicated global object and accessed directly here.
  */
 const ExpoRustJsi = requireNativeModule<{ install(): void }>('ExpoRustJsi');
 ExpoRustJsi.install();
 
-// Now that expo_rust_jsi_install has run, the Rust modules are registered.
-export const RustMath = requireNativeModule<RustMathModule>('RustMath');
-export const RustString = requireNativeModule<RustStringModule>('RustString');
+declare const globalThis: {
+  __ExpoRustJsiModules?: Record<string, any>;
+};
+
+function requireRustModule<T>(name: string): T {
+  const mod = globalThis.__ExpoRustJsiModules?.[name];
+  if (!mod) {
+    throw new Error(
+      `Cannot find Rust module '${name}'. Ensure expo-rust-jsi is linked and the Rust library was built.`
+    );
+  }
+  return mod as T;
+}
+
+export const RustMath = requireRustModule<RustMathModule>('RustMath');
+export const RustString = requireRustModule<RustStringModule>('RustString');
 
 export default ExpoRustJsi;
 
