@@ -3,6 +3,7 @@
 #include "expo-rust-jsi/src/bridge.rs.h"
 #include "jsi_shim.h"
 #include <stdexcept>
+#include <cstdio>
 
 namespace expo {
 namespace rust_jsi {
@@ -404,6 +405,10 @@ std::vector<PropNameID> RustHostObject::getPropertyNames(Runtime& rt) {
 
 void jsi_register_module(const RuntimeHandle& rth, rust::Str name,
                          uint64_t obj_handle) {
+  auto module_name = std::string(name.data(), name.size());
+  fprintf(stderr, "[ExpoRustJsi/C++] jsi_register_module called for '%s' (handle=%llu)\n",
+          module_name.c_str(), (unsigned long long)obj_handle);
+
   auto& rt = rt_from_handle(rth);
 
   // expo.modules is a read-only HostObject managed by ExpoModulesCore, so we
@@ -412,16 +417,21 @@ void jsi_register_module(const RuntimeHandle& rth, rust::Str name,
   Value container_val = rt.global().getProperty(rt, "__ExpoRustJsiModules");
   Object container;
   if (container_val.isObject()) {
+    fprintf(stderr, "[ExpoRustJsi/C++]   reusing existing __ExpoRustJsiModules\n");
     container = container_val.getObject(rt);
   } else {
+    fprintf(stderr, "[ExpoRustJsi/C++]   creating new __ExpoRustJsiModules\n");
     container = rt.createObject();
     rt.global().setProperty(rt, "__ExpoRustJsiModules", container);
   }
 
-  auto module_name = std::string(name.data(), name.size());
   auto obj = std::static_pointer_cast<Object>(HandleTable::instance().get(obj_handle));
   if (obj) {
     container.setProperty(rt, module_name.c_str(), Value(rt, *obj));
+    fprintf(stderr, "[ExpoRustJsi/C++]   set '%s' on container OK\n", module_name.c_str());
+  } else {
+    fprintf(stderr, "[ExpoRustJsi/C++]   ERROR: handle %llu not found in HandleTable!\n",
+            (unsigned long long)obj_handle);
   }
 }
 

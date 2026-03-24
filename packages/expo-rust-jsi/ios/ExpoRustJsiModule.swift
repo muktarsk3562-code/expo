@@ -11,10 +11,13 @@ public class ExpoRustJsiModule: Module {
 
         Function("install") {
             guard let appContext else {
+                NSLog("[ExpoRustJsi] ERROR: appContext is nil")
                 throw Exceptions.AppContextLost()
             }
             let runtime = try appContext.runtime
+            NSLog("[ExpoRustJsi] Swift install() calling ExpoRustJsiInstall, runtime=\(runtime)")
             ExpoRustJsiInstall(runtime)
+            NSLog("[ExpoRustJsi] Swift install() completed")
         }
     }
 }

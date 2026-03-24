@@ -13,7 +13,17 @@ import type { RustStringModule } from './RustString';
  * on a dedicated global object and accessed directly here.
  */
 const ExpoRustJsi = requireNativeModule<{ install(): void }>('ExpoRustJsi');
-ExpoRustJsi.install();
+console.warn('[ExpoRustJsi] calling install()...');
+try {
+  ExpoRustJsi.install();
+  console.warn('[ExpoRustJsi] install() returned');
+} catch (e) {
+  console.warn('[ExpoRustJsi] install() threw:', e);
+}
+console.warn(
+  '[ExpoRustJsi] __ExpoRustJsiModules =',
+  JSON.stringify(Object.keys((globalThis as any).__ExpoRustJsiModules ?? {}))
+);
 
 declare const globalThis: {
   __ExpoRustJsiModules?: Record<string, any>;

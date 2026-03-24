@@ -68,19 +68,31 @@ pub mod prelude {
 /// The runtime_ptr must be a valid pointer to a `jsi::Runtime`.
 #[no_mangle]
 pub unsafe extern "C" fn expo_rust_jsi_install(runtime_ptr: *mut std::ffi::c_void) {
+    eprintln!("[ExpoRustJsi] expo_rust_jsi_install called, ptr={:?}", runtime_ptr);
+
     if runtime_ptr.is_null() {
+        eprintln!("[ExpoRustJsi] ERROR: runtime_ptr is null!");
         return;
     }
 
-    let rt = value::Runtime {
-        handle: bridge::ffi::RuntimeHandle {
-            ptr: runtime_ptr as *mut u8,
-        },
-    };
+    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        let rt = value::Runtime {
+            handle: bridge::ffi::RuntimeHandle {
+                ptr: runtime_ptr as *mut u8,
+            },
+        };
 
-    // Get the module registry and install all modules (consumes registry)
-    let registry = get_module_registry();
-    registry.install(&rt);
+        // Get the module registry and install all modules (consumes registry)
+        let registry = get_module_registry();
+        let module_count = registry.module_count();
+        eprintln!("[ExpoRustJsi] registry has {} modules", module_count);
+        registry.install(&rt);
+        eprintln!("[ExpoRustJsi] install completed successfully");
+    }));
+
+    if let Err(e) = result {
+        eprintln!("[ExpoRustJsi] PANIC during install: {:?}", e);
+    }
 }
 
 /// Returns the global module registry.

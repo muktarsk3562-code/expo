@@ -501,11 +501,20 @@ impl ModuleRegistry {
         self.modules.insert(def.name.clone(), def);
     }
 
+    /// Returns the number of registered modules.
+    pub fn module_count(&self) -> usize {
+        self.modules.len()
+    }
+
     /// Install all registered modules onto the JSI runtime.
     /// Consumes self so function bodies can be moved into the callback registry.
     pub fn install(self, rt: &Runtime) {
         for (name, def) in self.modules {
+            eprintln!("[ExpoRustJsi] installing module '{}' ({} constants, {} fns, {} async fns)",
+                name, def.constants.len(), def.functions.len(), def.async_functions.len());
+
             let obj = rt.create_object();
+            eprintln!("[ExpoRustJsi]   created object handle={}", obj.handle);
 
             // Install constants as properties
             for constant in &def.constants {
@@ -524,8 +533,10 @@ impl ModuleRegistry {
                 install_async_host_function(rt, &obj, func);
             }
 
-            // Register the module object into expo.modules
+            // Register the module object into global.__ExpoRustJsiModules
+            eprintln!("[ExpoRustJsi]   calling jsi_register_module for '{}'", name);
             ffi::jsi_register_module(&rt.handle, name.as_str(), obj.handle);
+            eprintln!("[ExpoRustJsi]   registered '{}'", name);
         }
     }
 }
