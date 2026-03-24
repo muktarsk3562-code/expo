@@ -1,5 +1,3 @@
-import { requireNativeModule } from 'expo-modules-core';
-
 /**
  * RustString — a string utilities module implemented in Rust, exposed via JSI.
  *
@@ -9,7 +7,7 @@ import { requireNativeModule } from 'expo-modules-core';
  * console.log(RustString.to_upper_case('hello')); // 'HELLO'
  * ```
  */
-interface RustStringModule {
+export interface RustStringModule {
   // Function names match Rust snake_case identifiers
   to_upper_case(s: string): string;
   to_lower_case(s: string): string;
@@ -27,5 +25,3 @@ interface RustStringModule {
     separator?: string;
   }): string;
 }
-
-export const RustString = requireNativeModule<RustStringModule>('RustString');

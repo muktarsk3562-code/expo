@@ -1,5 +1,3 @@
-import { requireNativeModule } from 'expo-modules-core';
-
 /**
  * RustMath — a math module implemented in Rust, exposed directly via JSI.
  *
@@ -9,7 +7,7 @@ import { requireNativeModule } from 'expo-modules-core';
  * console.log(RustMath.add(2, 3)); // 5
  * ```
  */
-interface RustMathModule {
+export interface RustMathModule {
   // Constants
   readonly PI: number;
   readonly E: number;
@@ -33,5 +31,3 @@ interface RustMathModule {
   factorial(n: number): Promise<number>;
   is_prime(n: number): Promise<boolean>;
 }
-
-export const RustMath = requireNativeModule<RustMathModule>('RustMath');
