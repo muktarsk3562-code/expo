@@ -1,0 +1,1 @@
+../../../debug/build/expo-rust-jsi-core-4311ef5eeab86da4/out/cxxbridge/include/expo-rust-jsi-core/src/bridge.rs.h

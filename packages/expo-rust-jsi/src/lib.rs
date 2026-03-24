@@ -1,65 +1,13 @@
 //! # expo-rust-jsi
 //!
-//! Rust bindings for writing Expo native modules that integrate directly with
-//! the JavaScript Interface (JSI) runtime.
+//! Example Expo native module package written in Rust, using the
+//! `expo-rust-jsi-core` SDK for direct JSI integration.
 //!
-//! This crate provides a safe Rust API for creating native modules that are
-//! accessible from JavaScript without going through the Kotlin/Swift DSL layers.
-//! Instead, Rust code communicates directly with the JSI C++ layer via `cxx`.
-//!
-//! ## Architecture
-//!
-//! ```text
-//! ┌─────────────┐     ┌──────────────┐     ┌──────────────┐
-//! │  JavaScript  │────▶│   JSI (C++)   │────▶│  Rust Module │
-//! │   (Hermes)   │◀────│  jsi_shim.cpp │◀────│  (this crate)│
-//! └─────────────┘     └──────────────┘     └──────────────┘
-//!         │                   │                     │
-//!    JS calls            cxx bridge            ExpoModule
-//!    module.fn()         FfiValue              trait impl
-//! ```
-//!
-//! ## Quick Start
-//!
-//! ```rust,ignore
-//! use expo_rust_jsi::prelude::*;
-//!
-//! struct MathModule;
-//!
-//! #[expo_module("RustMath")]
-//! impl MathModule {
-//!     #[constant]
-//!     const PI: f64 = std::f64::consts::PI;
-//!
-//!     #[constant]
-//!     const E: f64 = std::f64::consts::E;
-//!
-//!     fn add(a: f64, b: f64) -> f64 {
-//!         a + b
-//!     }
-//!
-//!     fn multiply(a: f64, b: f64) -> f64 {
-//!         a * b
-//!     }
-//!
-//!     fn sqrt(x: f64) -> f64 {
-//!         x.sqrt()
-//!     }
-//! }
-//! ```
+//! This package demonstrates how to create Rust-based Expo modules.
+//! It re-exports the core SDK so consumers only need one dependency.
 
-pub mod bridge;
-pub mod module;
-pub mod value;
-
-/// Prelude module - import everything needed for module development.
-pub mod prelude {
-    pub use crate::module::{ExpoModule, ModuleBuilder, ModuleDefinition, ModuleRegistry};
-    pub use crate::value::{
-        ExpoError, FromJsValue, IntoJsValue, JsArray, JsObject, JsValue, PromiseHandle, Runtime,
-    };
-    pub use expo_module_macro::{expo_module, ExpoRecord};
-}
+// Re-export the core SDK so users can `use expo_rust_jsi::prelude::*`
+pub use expo_rust_jsi_core::*;
 
 /// C entry point called from the native side (Android JNI or iOS ObjC++)
 /// to initialize Rust modules on the JSI runtime.
@@ -68,43 +16,14 @@ pub mod prelude {
 /// The runtime_ptr must be a valid pointer to a `jsi::Runtime`.
 #[no_mangle]
 pub unsafe extern "C" fn expo_rust_jsi_install(runtime_ptr: *mut std::ffi::c_void) {
-    eprintln!("[ExpoRustJsi] expo_rust_jsi_install called, ptr={:?}", runtime_ptr);
-
-    if runtime_ptr.is_null() {
-        eprintln!("[ExpoRustJsi] ERROR: runtime_ptr is null!");
-        return;
-    }
-
-    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        let rt = value::Runtime {
-            handle: bridge::ffi::RuntimeHandle {
-                ptr: runtime_ptr as *mut u8,
-            },
-        };
-
-        // Get the module registry and install all modules (consumes registry)
-        let registry = get_module_registry();
-        let module_count = registry.module_count();
-        eprintln!("[ExpoRustJsi] registry has {} modules", module_count);
-        registry.install(&rt);
-        eprintln!("[ExpoRustJsi] install completed successfully");
-    }));
-
-    if let Err(e) = result {
-        eprintln!("[ExpoRustJsi] PANIC during install: {:?}", e);
-    }
+    expo_rust_jsi_core::install_modules(runtime_ptr, get_module_registry);
 }
 
-/// Returns the global module registry.
-/// Modules register themselves in this registry (typically via autolinking or
-/// explicit registration in a setup function).
-fn get_module_registry() -> module::ModuleRegistry {
+/// Returns the module registry with all Rust modules to install.
+fn get_module_registry() -> expo_rust_jsi_core::module::ModuleRegistry {
     #[allow(unused_mut)]
-    let mut registry = module::ModuleRegistry::new();
+    let mut registry = expo_rust_jsi_core::module::ModuleRegistry::new();
 
-    // Auto-register modules that were registered via the inventory pattern
-    // or explicit registration. In a real build, this would be populated
-    // by the build system / autolinking.
     #[cfg(feature = "example_modules")]
     {
         registry.register::<crate::examples::MathModule>();

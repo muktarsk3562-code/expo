@@ -14,12 +14,9 @@ default = ["example_modules"]
 example_modules = []
 
 [dependencies]
-cxx = "1.0"
-thiserror = "2"
-expo-module-macro = { path = "expo-module-macro" }
-
-[build-dependencies]
-cxx-build = "1.0"
-
-[workspace]
-members = ["expo-module-macro"]
+# In production: resolved from crates.io.
+# For local dev / monorepo: the platform build scripts (Gradle, CocoaPods)
+# generate .cargo/config.toml with [patch.crates-io] pointing to the
+# npm-resolved path of expo-rust-jsi-core. This works with all package
+# managers (npm, yarn, pnpm, bun) regardless of node_modules layout.
+expo-rust-jsi-core = "0.1"

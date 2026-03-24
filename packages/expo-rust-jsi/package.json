@@ -18,6 +18,9 @@
     "build:rust:ios": "cargo build --release --target aarch64-apple-ios && cargo build --release --target x86_64-apple-ios",
     "clean": "cargo clean"
   },
+  "dependencies": {
+    "expo-rust-jsi-core": "0.1.0"
+  },
   "peerDependencies": {
     "expo": "*",
     "expo-modules-core": "*"

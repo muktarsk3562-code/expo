@@ -136,6 +136,13 @@ dependencies = [
 name = "expo-rust-jsi"
 version = "0.1.0"
 dependencies = [
+ "expo-rust-jsi-core",
+]
+
+[[package]]
+name = "expo-rust-jsi-core"
+version = "0.1.0"
+dependencies = [
  "cxx",
  "cxx-build",
  "expo-module-macro",

@@ -3,6 +3,20 @@ project(expo-rust-jsi)
 
 set(CMAKE_CXX_STANDARD 20)
 
+# --- Resolve expo-rust-jsi-core path ---
+# The core package contains the C++ shim and cxx bridge headers.
+# Use the resolve script to find it (works with npm, yarn, pnpm, bun).
+execute_process(
+    COMMAND node "${CMAKE_CURRENT_SOURCE_DIR}/../scripts/resolve-rust-core.js" "--print-path"
+    OUTPUT_VARIABLE RUST_CORE_PATH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    RESULT_VARIABLE RESOLVE_RESULT
+)
+if(NOT RESOLVE_RESULT EQUAL 0)
+    message(FATAL_ERROR "Failed to resolve expo-rust-jsi-core. Is it installed?")
+endif()
+message(STATUS "expo-rust-jsi-core resolved: ${RUST_CORE_PATH}")
+
 # --- Rust library ---
 # The Rust static library is built by Gradle's cargo task before CMake runs.
 # It produces libexpo_rust_jsi.a for the target architecture.
@@ -16,15 +30,16 @@ set_target_properties(expo_rust_jsi_static PROPERTIES
 )
 
 # --- C++ shim layer ---
-set(CPP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../cpp")
+# The C++ shim lives in the core package
+set(CPP_DIR "${RUST_CORE_PATH}/cpp")
 set(RUST_TARGET_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../target")
 
 # Find the cxx-generated header directory.
-# cargo build puts cxx bridge headers under target/<profile>/build/expo-rust-jsi-*/out/cxxbridge/
+# cargo build puts cxx bridge headers under target/<profile>/build/expo-rust-jsi-core-*/out/cxxbridge/
 # We glob for it since the hash in the directory name varies.
-file(GLOB CXX_BRIDGE_DIRS "${RUST_TARGET_DIR}/*/build/expo-rust-jsi-*/out/cxxbridge")
+file(GLOB CXX_BRIDGE_DIRS "${RUST_TARGET_DIR}/*/build/expo-rust-jsi-core-*/out/cxxbridge")
 # Also check the target-specific build dirs
-file(GLOB CXX_BRIDGE_DIRS_TARGET "${RUST_TARGET_DIR}/*/*/build/expo-rust-jsi-*/out/cxxbridge")
+file(GLOB CXX_BRIDGE_DIRS_TARGET "${RUST_TARGET_DIR}/*/*/build/expo-rust-jsi-core-*/out/cxxbridge")
 list(APPEND CXX_BRIDGE_DIRS ${CXX_BRIDGE_DIRS_TARGET})
 
 # Pick the first match (there should be only one per build)
@@ -46,7 +61,7 @@ add_library(expo-rust-jsi SHARED
 target_include_directories(expo-rust-jsi PRIVATE
     "${CPP_DIR}"
     "${CXX_INCLUDE_DIR}"   # rust/cxx.h
-    "${CXX_CRATE_DIR}"     # expo-rust-jsi/src/bridge.rs.h
+    "${CXX_CRATE_DIR}"     # expo-rust-jsi-core/src/bridge.rs.h
 )
 
 # Find React Native packages

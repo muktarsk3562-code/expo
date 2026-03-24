@@ -1,0 +1,24 @@
+[package]
+name = "expo-rust-jsi-core"
+version = "0.1.0"
+edition = "2021"
+description = "Core Rust SDK for writing Expo native modules via direct JSI integration"
+license = "MIT"
+repository = "https://github.com/expo/expo"
+keywords = ["expo", "react-native", "jsi", "ffi"]
+categories = ["api-bindings", "development-tools"]
+
+[lib]
+name = "expo_rust_jsi_core"
+crate-type = ["lib"]
+
+[dependencies]
+cxx = "1.0"
+thiserror = "2"
+expo-module-macro = { path = "expo-module-macro" }
+
+[build-dependencies]
+cxx-build = "1.0"
+
+[workspace]
+members = ["expo-module-macro"]

@@ -10,7 +10,7 @@
 //   console.log(RustMath.sqrt(16));        // 4
 //   console.log(RustMath.fibonacci(10));   // 55
 
-use crate::prelude::*;
+use expo_rust_jsi_core::prelude::*;
 
 pub struct MathModule;
 

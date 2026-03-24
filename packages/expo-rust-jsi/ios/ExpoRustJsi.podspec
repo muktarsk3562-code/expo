@@ -24,7 +24,7 @@ Pod::Spec.new do |s|
     '**/*.{swift,h,m,mm}',
   ]
 
-  # cxx-generated headers are under target/<target>/release/build/expo-rust-jsi-*/out/cxxbridge/
+  # cxx-generated headers are under target/<target>/release/build/expo-rust-jsi-core-*/out/cxxbridge/
   # We add a wildcard search path so the compiler can find rust/cxx.h and the bridge header.
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
@@ -32,8 +32,8 @@ Pod::Spec.new do |s|
     'CLANG_CXX_LANGUAGE_STANDARD' => 'c++20',
     'HEADER_SEARCH_PATHS' => [
       '"${PODS_ROOT}/Headers/Public/React-jsi"',
-      '"${PODS_TARGET_SRCROOT}/../target/*/release/build/expo-rust-jsi-*/out/cxxbridge/include"',
-      '"${PODS_TARGET_SRCROOT}/../target/*/release/build/expo-rust-jsi-*/out/cxxbridge/crate"',
+      '"${PODS_TARGET_SRCROOT}/../target/*/release/build/expo-rust-jsi-core-*/out/cxxbridge/include"',
+      '"${PODS_TARGET_SRCROOT}/../target/*/release/build/expo-rust-jsi-core-*/out/cxxbridge/crate"',
     ].join(' '),
   }
 
@@ -45,8 +45,7 @@ Pod::Spec.new do |s|
   }
 
   # Build Rust library as part of the Xcode build.
-  # We source .xcode.env to pick up the user's cargo/rustup PATH,
-  # similar to how React Native sources it for the node binary.
+  # First resolves expo-rust-jsi-core path via npm, then builds with cargo.
   s.script_phase = {
     name: 'Build Rust Library',
     script: <<~SCRIPT,
@@ -78,6 +77,16 @@ Pod::Spec.new do |s|
 
       # Move to the package root (one level up from ios/)
       cd "${PODS_TARGET_SRCROOT}/.."
+
+      # Resolve expo-rust-jsi-core and generate .cargo/config.toml
+      # This ensures cargo can find the core crate regardless of
+      # package manager (npm, yarn, pnpm, bun).
+      echo "Resolving expo-rust-jsi-core..."
+      node scripts/resolve-rust-core.js
+      if [ $? -ne 0 ]; then
+        echo "error: Failed to resolve expo-rust-jsi-core. Is it installed?"
+        exit 1
+      fi
 
       # Determine Rust target based on platform and architecture
       if [ "${PLATFORM_NAME}" = "iphonesimulator" ]; then

@@ -43,6 +43,15 @@ android {
     }
 }
 
+// Resolve the expo-rust-jsi-core npm package path.
+// This works with all package managers (npm, yarn, pnpm, bun).
+val resolveRustCorePath: String by lazy {
+    val result = providers.exec {
+        commandLine("node", "${project.projectDir}/../scripts/resolve-rust-core.js", "--print-path")
+    }
+    result.standardOutput.asText.get().trim()
+}
+
 // Map Android ABI to Rust target triple
 val abiToRustTarget = mapOf(
     "armeabi-v7a" to "armv7-linux-androideabi",
@@ -50,6 +59,14 @@ val abiToRustTarget = mapOf(
     "x86" to "i686-linux-android",
     "x86_64" to "x86_64-linux-android"
 )
+
+// Task to resolve expo-rust-jsi-core and generate .cargo/config.toml
+// This must run before any cargo build task.
+val resolveRustCore = tasks.register<Exec>("resolveRustCore") {
+    description = "Resolve expo-rust-jsi-core path and generate .cargo/config.toml"
+    workingDir = file("${project.projectDir}/..")
+    commandLine("node", "scripts/resolve-rust-core.js")
+}
 
 // Task to build the Rust library for all target architectures
 android.defaultConfig.ndk.abiFilters.forEach { abi ->
@@ -59,6 +76,10 @@ android.defaultConfig.ndk.abiFilters.forEach { abi ->
     tasks.register<Exec>(taskName) {
         description = "Build Rust library for $abi ($rustTarget)"
         workingDir = file("${project.projectDir}/..")
+
+        // Ensure core path is resolved and .cargo/config.toml is generated first
+        dependsOn(resolveRustCore)
+
         commandLine(
             "cargo", "build",
             "--release",
