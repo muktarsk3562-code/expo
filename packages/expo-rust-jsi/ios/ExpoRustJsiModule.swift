@@ -2,8 +2,8 @@ import ExpoModulesCore
 
 /// Expo module that loads and initializes Rust-based JSI modules on iOS.
 ///
-/// This module calls into the Rust static library via the C++ shim to install
-/// Rust modules directly onto the JSI runtime.
+/// This module calls into the Rust static library via an Objective-C++ shim
+/// to install Rust modules directly onto the JSI runtime.
 public class ExpoRustJsiModule: Module {
     public func definition() -> ModuleDefinition {
         Name("ExpoRustJsi")
@@ -12,10 +12,9 @@ public class ExpoRustJsiModule: Module {
             guard let runtime = try? self.appContext?.runtime else {
                 return
             }
-            // The runtime pointer is passed to the Rust init function
-            // which registers all Rust modules onto expo.modules
-            let runtimePtr = runtime.unsafePointer()
-            expo_rust_jsi_install(runtimePtr)
+            // ExpoRustJsiInstall is defined in ExpoRustJsi.mm — it extracts
+            // the raw jsi::Runtime* and passes it to the Rust C entry point.
+            ExpoRustJsiInstall(runtime)
         }
     }
 }

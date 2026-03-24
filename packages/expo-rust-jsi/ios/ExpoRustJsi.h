@@ -1,8 +1,10 @@
 #pragma once
 
-#include <Foundation/Foundation.h>
+#import <Foundation/Foundation.h>
 
-// C interface to the Rust static library.
-// This header is included in the auto-generated module map
-// (via DEFINES_MODULE = YES) so Swift can call these functions directly.
-extern void expo_rust_jsi_install(void* runtime_ptr);
+@class EXJavaScriptRuntime;
+
+/// Installs all Rust JSI modules onto the given JavaScript runtime.
+/// Extracts the raw jsi::Runtime* from EXJavaScriptRuntime and passes
+/// it to the Rust C entry point.
+void ExpoRustJsiInstall(EXJavaScriptRuntime * _Nonnull runtime);
