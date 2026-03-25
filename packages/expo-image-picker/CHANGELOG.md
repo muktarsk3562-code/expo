@@ -17,6 +17,7 @@
 
 ### 💡 Others
 
+- [iOS] Added explicit `import React` for xcframework compatibility.
 - [android] bump Android-Image-Cropper dependency ([#43433](https://github.com/expo/expo/pull/43433) by [@vonovak](https://github.com/vonovak))
 
 ## 55.0.9 — 2026-02-25

@@ -14,6 +14,8 @@
 
 ### 💡 Others
 
+- [iOS] Use `@_implementationOnly import SDWebImageWebPCoder` to hide third-party dependency from public module interface.
+
 ## 55.0.9 — 2026-02-25
 
 _This version does not introduce any user-facing changes._

@@ -14,6 +14,8 @@
 
 ### 💡 Others
 
+- [iOS] Use `@_implementationOnly import SDWebImage` to hide third-party dependency from public module interface.
+
 ## 55.0.5 — 2026-02-25
 
 ### 🐛 Bug fixes

@@ -15,6 +15,8 @@
 
 ### 💡 Others
 
+- [iOS] Added explicit `import React` for xcframework compatibility.
+
 ## 55.0.9 — 2026-02-25
 
 ### 🎉 New features
