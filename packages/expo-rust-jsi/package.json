@@ -19,7 +19,7 @@
     "clean": "cargo clean"
   },
   "dependencies": {
-    "expo-rust-jsi-core": "0.1.0"
+    "expo-rust-jsi-core": "workspace:*"
   },
   "peerDependencies": {
     "expo": "*",

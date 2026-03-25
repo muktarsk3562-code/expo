@@ -175,6 +175,9 @@ importers:
       expo-router:
         specifier: workspace:*
         version: link:../../packages/expo-router
+      expo-rust-jsi:
+        specifier: workspace:*
+        version: link:../../packages/expo-rust-jsi
       expo-splash-screen:
         specifier: workspace:*
         version: link:../../packages/expo-splash-screen
@@ -989,6 +992,9 @@ importers:
       expo-progress:
         specifier: ^0.0.2
         version: 0.0.2(ff34c120dd706cd41747d855d4cf417c)
+      expo-rust-jsi:
+        specifier: workspace:*
+        version: link:../../packages/expo-rust-jsi
       expo-screen-capture:
         specifier: workspace:*
         version: link:../../packages/expo-screen-capture
@@ -4885,6 +4891,20 @@ importers:
       tsd:
         specifier: ^0.28.1
         version: 0.28.1
+
+  packages/expo-rust-jsi:
+    dependencies:
+      expo:
+        specifier: '*'
+        version: link:../expo
+      expo-modules-core:
+        specifier: '*'
+        version: link:../expo-modules-core
+      expo-rust-jsi-core:
+        specifier: workspace:*
+        version: link:../expo-rust-jsi-core
+
+  packages/expo-rust-jsi-core: {}
 
   packages/expo-screen-capture:
     dependencies:
