@@ -72,7 +72,7 @@
     "expo-network-addons": "workspace:*",
     "expo-notifications": "workspace:*",
     "expo-router": "workspace:*",
-    "expo-rust-jsi": "file:./modules/expo-rust-jsi",
+    "expo-rust": "file:./modules/expo-rust",
     "expo-splash-screen": "workspace:*",
     "expo-status-bar": "workspace:*",
     "expo-tracking-transparency": "workspace:*",

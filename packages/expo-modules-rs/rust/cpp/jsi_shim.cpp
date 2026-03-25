@@ -406,30 +406,30 @@ std::vector<PropNameID> RustHostObject::getPropertyNames(Runtime& rt) {
 void jsi_register_module(const RuntimeHandle& rth, rust::Str name,
                          uint64_t obj_handle) {
   auto module_name = std::string(name.data(), name.size());
-  fprintf(stderr, "[ExpoRustJsi/C++] jsi_register_module called for '%s' (handle=%llu)\n",
+  fprintf(stderr, "[ExpoRust/C++] jsi_register_module called for '%s' (handle=%llu)\n",
           module_name.c_str(), (unsigned long long)obj_handle);
 
   auto& rt = rt_from_handle(rth);
 
   // expo.modules is a read-only HostObject managed by ExpoModulesCore, so we
   // cannot set properties on it directly.  Instead, install Rust modules on a
-  // dedicated global: global.__ExpoRustJsiModules.
-  Value container_val = rt.global().getProperty(rt, "__ExpoRustJsiModules");
+  // dedicated global: global.__ExpoRustModules.
+  Value container_val = rt.global().getProperty(rt, "__ExpoRustModules");
   if (!container_val.isObject()) {
-    fprintf(stderr, "[ExpoRustJsi/C++]   creating new __ExpoRustJsiModules\n");
-    rt.global().setProperty(rt, "__ExpoRustJsiModules", Object(rt));
-    container_val = rt.global().getProperty(rt, "__ExpoRustJsiModules");
+    fprintf(stderr, "[ExpoRust/C++]   creating new __ExpoRustModules\n");
+    rt.global().setProperty(rt, "__ExpoRustModules", Object(rt));
+    container_val = rt.global().getProperty(rt, "__ExpoRustModules");
   } else {
-    fprintf(stderr, "[ExpoRustJsi/C++]   reusing existing __ExpoRustJsiModules\n");
+    fprintf(stderr, "[ExpoRust/C++]   reusing existing __ExpoRustModules\n");
   }
   Object container = container_val.getObject(rt);
 
   auto obj = std::static_pointer_cast<Object>(HandleTable::instance().get(obj_handle));
   if (obj) {
     container.setProperty(rt, module_name.c_str(), Value(rt, *obj));
-    fprintf(stderr, "[ExpoRustJsi/C++]   set '%s' on container OK\n", module_name.c_str());
+    fprintf(stderr, "[ExpoRust/C++]   set '%s' on container OK\n", module_name.c_str());
   } else {
-    fprintf(stderr, "[ExpoRustJsi/C++]   ERROR: handle %llu not found in HandleTable!\n",
+    fprintf(stderr, "[ExpoRust/C++]   ERROR: handle %llu not found in HandleTable!\n",
             (unsigned long long)obj_handle);
   }
 }
