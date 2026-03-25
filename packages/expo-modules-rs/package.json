@@ -11,9 +11,6 @@
     "url": "https://github.com/expo/expo.git",
     "directory": "packages/expo-modules-rs"
   },
-  "files": [
-    "rust/"
-  ],
   "scripts": {
     "build:rust": "cd rust && cargo build --release",
     "test:rust": "cd rust && cargo test",
