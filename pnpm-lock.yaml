@@ -175,9 +175,9 @@ importers:
       expo-router:
         specifier: workspace:*
         version: link:../../packages/expo-router
-      expo-rust-jsi:
-        specifier: workspace:*
-        version: link:../../packages/expo-rust-jsi
+      expo-rust:
+        specifier: file:./modules/expo-rust
+        version: file:apps/bare-expo/modules/expo-rust(expo-modules-core@packages+expo-modules-core)(expo@packages+expo)
       expo-splash-screen:
         specifier: workspace:*
         version: link:../../packages/expo-splash-screen
@@ -992,9 +992,6 @@ importers:
       expo-progress:
         specifier: ^0.0.2
         version: 0.0.2(ff34c120dd706cd41747d855d4cf417c)
-      expo-rust-jsi:
-        specifier: workspace:*
-        version: link:../../packages/expo-rust-jsi
       expo-screen-capture:
         specifier: workspace:*
         version: link:../../packages/expo-screen-capture
@@ -4574,6 +4571,8 @@ importers:
         specifier: workspace:*
         version: link:../expo-module-scripts
 
+  packages/expo-modules-rs: {}
+
   packages/expo-modules-test-core:
     dependencies:
       '@types/node':
@@ -4891,20 +4890,6 @@ importers:
       tsd:
         specifier: ^0.28.1
         version: 0.28.1
-
-  packages/expo-rust-jsi:
-    dependencies:
-      expo:
-        specifier: '*'
-        version: link:../expo
-      expo-modules-core:
-        specifier: '*'
-        version: link:../expo-modules-core
-      expo-rust-jsi-core:
-        specifier: workspace:*
-        version: link:../expo-rust-jsi-core
-
-  packages/expo-rust-jsi-core: {}
 
   packages/expo-screen-capture:
     dependencies:
@@ -10807,6 +10792,12 @@ packages:
       react-native-reanimated: ^1.9.0
       react-native-redash: ^14.1.1
       react-native-svg: ^10.1.0
+
+  expo-rust@file:apps/bare-expo/modules/expo-rust:
+    resolution: {directory: apps/bare-expo/modules/expo-rust, type: directory}
+    peerDependencies:
+      expo: workspace:*
+      expo-modules-core: '*'
 
   expo-three@7.0.1:
     resolution: {integrity: sha512-B8OyGwjQZ+NbGBMT3zqe2ngV7mI147yJL8eR56y9SQLrsEkv8+DiMpm3f88r7/LJoFXKGg8mmMrK09hMvRqGHg==}
@@ -21391,6 +21382,12 @@ snapshots:
       react-native-reanimated: 4.2.2(patch_hash=6e8b00440659b2189e126b35ef5e5b3c49c1933c75c3ed90886f5edaceee01b5)(react-native-worklets@0.7.4(patch_hash=3f49a21b44ba558989a3366eeff9c92ee331e18b736dbe89c5962ecc6f2802f1)(@babel/core@7.29.0)(react-native@0.85.0-rc.5(@babel/core@7.29.0)(@react-native/jest-preset@0.85.0-rc.5(@babel/core@7.29.0)(react@19.2.3))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3))(react-native@0.85.0-rc.5(@babel/core@7.29.0)(@react-native/jest-preset@0.85.0-rc.5(@babel/core@7.29.0)(react@19.2.3))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3)
       react-native-redash: 14.2.4(react-native-gesture-handler@2.30.0(react-native@0.85.0-rc.5(@babel/core@7.29.0)(@react-native/jest-preset@0.85.0-rc.5(@babel/core@7.29.0)(react@19.2.3))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3))(react-native-reanimated@4.2.2(patch_hash=6e8b00440659b2189e126b35ef5e5b3c49c1933c75c3ed90886f5edaceee01b5)(react-native-worklets@0.7.4(patch_hash=3f49a21b44ba558989a3366eeff9c92ee331e18b736dbe89c5962ecc6f2802f1)(@babel/core@7.29.0)(react-native@0.85.0-rc.5(@babel/core@7.29.0)(@react-native/jest-preset@0.85.0-rc.5(@babel/core@7.29.0)(react@19.2.3))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3))(react-native@0.85.0-rc.5(@babel/core@7.29.0)(@react-native/jest-preset@0.85.0-rc.5(@babel/core@7.29.0)(react@19.2.3))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3))(react-native@0.85.0-rc.5(@babel/core@7.29.0)(@react-native/jest-preset@0.85.0-rc.5(@babel/core@7.29.0)(react@19.2.3))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3)
       react-native-svg: 15.15.4(react-native@0.85.0-rc.5(@babel/core@7.29.0)(@react-native/jest-preset@0.85.0-rc.5(@babel/core@7.29.0)(react@19.2.3))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3)
+
+  expo-rust@file:apps/bare-expo/modules/expo-rust(expo-modules-core@packages+expo-modules-core)(expo@packages+expo):
+    dependencies:
+      expo: link:packages/expo
+      expo-modules-core: link:packages/expo-modules-core
+      expo-modules-rs: link:packages/expo-modules-rs
 
   expo-three@7.0.1(expo-asset@packages+expo-asset)(expo-file-system@packages+expo-file-system)(expo-font@packages+expo-font)(expo-modules-core@packages+expo-modules-core)(react-native@0.85.0-rc.5(@babel/core@7.29.0)(@react-native/jest-preset@0.85.0-rc.5(@babel/core@7.29.0)(react@19.2.3))(@types/react@19.2.14)(react@19.2.3))(react@19.2.3)(three@0.137.5):
     dependencies:
