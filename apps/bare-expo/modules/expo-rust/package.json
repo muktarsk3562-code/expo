@@ -19,7 +19,7 @@
     "expo-modules-rs": "workspace:*"
   },
   "peerDependencies": {
-    "expo": "*",
+    "expo": "workspace:*",
     "expo-modules-core": "*"
   }
 }

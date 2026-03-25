@@ -64,8 +64,6 @@ pub unsafe fn install_modules(
     runtime_ptr: *mut std::ffi::c_void,
     get_registry: impl FnOnce() -> module::ModuleRegistry,
 ) {
-    eprintln!("[ExpoRust] install_modules called, ptr={:?}", runtime_ptr);
-
     if runtime_ptr.is_null() {
         eprintln!("[ExpoRust] ERROR: runtime_ptr is null!");
         return;
@@ -80,9 +78,7 @@ pub unsafe fn install_modules(
 
         let registry = get_registry();
         let module_count = registry.module_count();
-        eprintln!("[ExpoRust] registry has {} modules", module_count);
         registry.install(&rt);
-        eprintln!("[ExpoRust] install completed successfully");
     }));
 
     if let Err(e) = result {

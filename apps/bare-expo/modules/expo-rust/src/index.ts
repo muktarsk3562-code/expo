@@ -1,4 +1,4 @@
-import { requireNativeModule } from 'expo-modules-core';
+import { requireNativeModule } from 'expo';
 
 import type { RustMathModule } from './RustMath';
 import type { RustStringModule } from './RustString';
@@ -13,17 +13,11 @@ import type { RustStringModule } from './RustString';
  * on a dedicated global object and accessed directly here.
  */
 const ExpoRust = requireNativeModule<{ install(): void }>('ExpoRust');
-console.warn('[ExpoRust] calling install()...');
 try {
   ExpoRust.install();
-  console.warn('[ExpoRust] install() returned');
 } catch (e) {
   console.warn('[ExpoRust] install() threw:', e);
 }
-console.warn(
-  '[ExpoRust] __ExpoRustModules =',
-  JSON.stringify(Object.keys((globalThis as any).__ExpoRustModules ?? {}))
-);
 
 declare const globalThis: {
   __ExpoRustModules?: Record<string, any>;

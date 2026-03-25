@@ -112,7 +112,6 @@
     "expo-print": "workspace:*",
     "expo-processing": "workspace:*",
     "expo-progress": "^0.0.2",
-    "expo-rust-jsi": "workspace:*",
     "expo-screen-capture": "workspace:*",
     "expo-screen-orientation": "workspace:*",
     "expo-secure-store": "workspace:*",

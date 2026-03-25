@@ -1,22 +1,11 @@
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { RustMath, RustString } from 'expo-rust';
 
 import Button from '../components/Button';
 import HeadingText from '../components/HeadingText';
 import MonoText from '../components/MonoText';
 import Colors from '../constants/Colors';
-
-let RustMath: any = null;
-let RustString: any = null;
-let loadError: string | null = null;
-
-try {
-  const mod = require('expo-rust-jsi');
-  RustMath = mod.RustMath;
-  RustString = mod.RustString;
-} catch (e: any) {
-  loadError = e.message;
-}
 
 type ResultEntry = { label: string; value: string; isError?: boolean };
 
@@ -28,9 +17,7 @@ export default function RustModuleScreen() {
       const value = fn();
       if (value instanceof Promise) {
         value
-          .then((v: any) =>
-            setResults((prev) => [...prev, { label, value: JSON.stringify(v) }])
-          )
+          .then((v: any) => setResults((prev) => [...prev, { label, value: JSON.stringify(v) }]))
           .catch((e: any) =>
             setResults((prev) => [...prev, { label, value: e.message, isError: true }])
           );
@@ -41,19 +28,6 @@ export default function RustModuleScreen() {
       setResults((prev) => [...prev, { label, value: e.message, isError: true }]);
     }
   };
-
-  if (loadError) {
-    return (
-      <ScrollView style={styles.container}>
-        <HeadingText>expo-rust-jsi not available</HeadingText>
-        <MonoText containerStyle={styles.errorBox}>{loadError}</MonoText>
-        <Text style={styles.hint}>
-          This module requires a native build with Rust toolchain. It is not available in Expo
-          Go.
-        </Text>
-      </ScrollView>
-    );
-  }
 
   return (
     <ScrollView style={styles.container}>
@@ -130,9 +104,7 @@ export default function RustModuleScreen() {
       <View style={styles.buttonRow}>
         <Button
           title='to_upper_case("hello")'
-          onPress={() =>
-            addResult('to_upper_case', () => RustString.to_upper_case('hello'))
-          }
+          onPress={() => addResult('to_upper_case', () => RustString.to_upper_case('hello'))}
           style={styles.button}
         />
         <Button
@@ -147,9 +119,7 @@ export default function RustModuleScreen() {
         />
         <Button
           title='contains("hello world", "world")'
-          onPress={() =>
-            addResult('contains', () => RustString.contains('hello world', 'world'))
-          }
+          onPress={() => addResult('contains', () => RustString.contains('hello world', 'world'))}
           style={styles.button}
         />
         <Button
@@ -185,9 +155,7 @@ export default function RustModuleScreen() {
 
       {/* Results */}
       <HeadingText>Results</HeadingText>
-      {results.length === 0 && (
-        <Text style={styles.hint}>Tap a button above to see results</Text>
-      )}
+      {results.length === 0 && <Text style={styles.hint}>Tap a button above to see results</Text>}
       {results.map((r, i) => (
         <View key={i} style={styles.resultRow}>
           <Text style={styles.resultLabel}>{r.label}</Text>
@@ -198,11 +166,7 @@ export default function RustModuleScreen() {
       ))}
 
       {results.length > 0 && (
-        <Button
-          title="Clear Results"
-          onPress={() => setResults([])}
-          style={styles.clearButton}
-        />
+        <Button title="Clear Results" onPress={() => setResults([])} style={styles.clearButton} />
       )}
 
       <View style={styles.spacer} />

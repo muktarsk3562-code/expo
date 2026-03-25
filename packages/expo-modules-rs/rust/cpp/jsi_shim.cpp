@@ -406,9 +406,6 @@ std::vector<PropNameID> RustHostObject::getPropertyNames(Runtime& rt) {
 void jsi_register_module(const RuntimeHandle& rth, rust::Str name,
                          uint64_t obj_handle) {
   auto module_name = std::string(name.data(), name.size());
-  fprintf(stderr, "[ExpoRust/C++] jsi_register_module called for '%s' (handle=%llu)\n",
-          module_name.c_str(), (unsigned long long)obj_handle);
-
   auto& rt = rt_from_handle(rth);
 
   // expo.modules is a read-only HostObject managed by ExpoModulesCore, so we
@@ -416,7 +413,6 @@ void jsi_register_module(const RuntimeHandle& rth, rust::Str name,
   // dedicated global: global.__ExpoRustModules.
   Value container_val = rt.global().getProperty(rt, "__ExpoRustModules");
   if (!container_val.isObject()) {
-    fprintf(stderr, "[ExpoRust/C++]   creating new __ExpoRustModules\n");
     rt.global().setProperty(rt, "__ExpoRustModules", Object(rt));
     container_val = rt.global().getProperty(rt, "__ExpoRustModules");
   } else {
@@ -427,7 +423,6 @@ void jsi_register_module(const RuntimeHandle& rth, rust::Str name,
   auto obj = std::static_pointer_cast<Object>(HandleTable::instance().get(obj_handle));
   if (obj) {
     container.setProperty(rt, module_name.c_str(), Value(rt, *obj));
-    fprintf(stderr, "[ExpoRust/C++]   set '%s' on container OK\n", module_name.c_str());
   } else {
     fprintf(stderr, "[ExpoRust/C++]   ERROR: handle %llu not found in HandleTable!\n",
             (unsigned long long)obj_handle);
