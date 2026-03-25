@@ -49,6 +49,9 @@ RCT_EXPORT_MODULE(ExpoModulesCore);
   }
   EXRuntime *runtime = [EXJavaScriptRuntimeManager runtimeFromBridge:_bridge];
 
+  // Cast to protocol to access properties without importing Swift.h
+  id<EXAppContextProtocol> ctx = (id<EXAppContextProtocol>)_appContext;
+
   if (!runtime) {
     NSLog(@"Unable to get the JSI runtime from the bridge instance, make sure to use ExpoReactNativeFactory for newer bridgeless integration");
     return;
