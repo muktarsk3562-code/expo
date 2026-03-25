@@ -19,8 +19,17 @@ message(STATUS "expo-modules-rs resolved: ${RUST_CORE_PATH}")
 
 # --- Rust library ---
 # The Rust static library is built by Gradle's cargo task before CMake runs.
-# It produces libexpo_rust.a for the target architecture.
-set(RUST_LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../target/${ANDROID_ABI}")
+# Map Android ABI to Rust target triple to find the pre-built library.
+if(ANDROID_ABI STREQUAL "armeabi-v7a")
+    set(RUST_TARGET "armv7-linux-androideabi")
+elseif(ANDROID_ABI STREQUAL "arm64-v8a")
+    set(RUST_TARGET "aarch64-linux-android")
+elseif(ANDROID_ABI STREQUAL "x86")
+    set(RUST_TARGET "i686-linux-android")
+elseif(ANDROID_ABI STREQUAL "x86_64")
+    set(RUST_TARGET "x86_64-linux-android")
+endif()
+set(RUST_LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../target/${RUST_TARGET}/release")
 set(RUST_LIB "${RUST_LIB_DIR}/libexpo_rust.a")
 
 # Import the pre-built Rust static library

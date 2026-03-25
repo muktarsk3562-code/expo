@@ -1,5 +1,6 @@
 package expo.modules.rust
 
+import expo.modules.core.utilities.ifNull
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 
@@ -22,8 +23,12 @@ class ExpoRustModule : Module() {
         Name("ExpoRust")
 
         Function("install") {
-            val runtime = appContext.runtime
-            nativeInstall(runtime.rawPointer)
+          val jsContextHolder = appContext.runtime.reactContext?.javaScriptContextHolder?.get()
+            ?: throw IllegalStateException("JavaScript context is not available")
+          val jsRuntimePointer = jsContextHolder.takeIf { it != 0L }.ifNull {
+            throw IllegalStateException("❌ Cannot install JSI interop - JS runtime pointer is null")
+          }
+          nativeInstall(jsRuntimePointer)
         }
     }
 
