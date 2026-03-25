@@ -1,6 +1,6 @@
-//! # expo-rust-jsi-core
+//! # expo-modules-rs
 //!
-//! Core SDK for writing Expo native modules in Rust that integrate directly
+//! Rust SDK for writing Expo native modules that integrate directly
 //! with the JavaScript Interface (JSI) runtime.
 //!
 //! This crate provides:
@@ -24,7 +24,7 @@
 //! ## Quick Start
 //!
 //! ```rust,ignore
-//! use expo_rust_jsi_core::prelude::*;
+//! use expo_modules_rs::prelude::*;
 //!
 //! struct MathModule;
 //!

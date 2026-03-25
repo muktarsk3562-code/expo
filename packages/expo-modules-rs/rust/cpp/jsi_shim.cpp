@@ -1,6 +1,6 @@
 // Include the cxx-generated header first — it defines FfiValue, ValueKind,
 // RuntimeHandle, and the rust_invoke_host_fn declaration.
-#include "expo-rust-jsi-core/src/bridge.rs.h"
+#include "expo-modules-rs/src/bridge.rs.h"
 #include "jsi_shim.h"
 #include <stdexcept>
 #include <cstdio>

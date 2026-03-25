@@ -1,15 +1,15 @@
 [package]
-name = "expo-rust-jsi-core"
+name = "expo-modules-rs"
 version = "0.1.0"
 edition = "2021"
-description = "Core Rust SDK for writing Expo native modules via direct JSI integration"
+description = "Rust SDK for writing Expo native modules via direct JSI integration"
 license = "MIT"
 repository = "https://github.com/expo/expo"
 keywords = ["expo", "react-native", "jsi", "ffi"]
 categories = ["api-bindings", "development-tools"]
 
 [lib]
-name = "expo_rust_jsi_core"
+name = "expo_modules_rs"
 crate-type = ["lib"]
 
 [dependencies]

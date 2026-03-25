@@ -1,7 +1,7 @@
 {
-  "name": "expo-rust-jsi-core",
+  "name": "expo-modules-rs",
   "version": "0.1.0",
-  "description": "Core Rust SDK for writing Expo native modules via direct JSI integration",
+  "description": "Rust SDK for writing Expo native modules via direct JSI integration",
   "main": "rust/src/lib.rs",
   "license": "MIT",
   "author": "Expo",
@@ -9,7 +9,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/expo/expo.git",
-    "directory": "packages/expo-rust-jsi-core"
+    "directory": "packages/expo-modules-rs"
   },
   "files": [
     "rust/"

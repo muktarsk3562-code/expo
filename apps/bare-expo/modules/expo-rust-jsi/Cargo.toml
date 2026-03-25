@@ -1,0 +1,20 @@
+[package]
+name = "expo-rust-jsi"
+version = "0.1.0"
+edition = "2021"
+description = "Example Rust-based Expo module for bare-expo"
+license = "MIT"
+
+[lib]
+name = "expo_rust_jsi"
+crate-type = ["staticlib", "lib"]
+
+[features]
+default = ["example_modules"]
+example_modules = []
+
+[dependencies]
+# Resolved from crates.io in production. For local dev / monorepo, the build
+# scripts generate .cargo/config.toml with [patch.crates-io] pointing to the
+# npm-resolved path. Works with all package managers (npm, yarn, pnpm, bun).
+expo-modules-rs = "0.1"

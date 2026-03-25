@@ -43,7 +43,7 @@ android {
     }
 }
 
-// Resolve the expo-rust-jsi-core npm package path.
+// Resolve the expo-modules-rs npm package path.
 // This works with all package managers (npm, yarn, pnpm, bun).
 val resolveRustCorePath: String by lazy {
     val result = providers.exec {
@@ -60,10 +60,10 @@ val abiToRustTarget = mapOf(
     "x86_64" to "x86_64-linux-android"
 )
 
-// Task to resolve expo-rust-jsi-core and generate .cargo/config.toml
+// Task to resolve expo-modules-rs and generate .cargo/config.toml
 // This must run before any cargo build task.
 val resolveRustCore = tasks.register<Exec>("resolveRustCore") {
-    description = "Resolve expo-rust-jsi-core path and generate .cargo/config.toml"
+    description = "Resolve expo-modules-rs path and generate .cargo/config.toml"
     workingDir = file("${project.projectDir}/..")
     commandLine("node", "scripts/resolve-rust-core.js")
 }

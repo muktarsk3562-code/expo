@@ -17,7 +17,7 @@ fn main() {
         build.define("EXPO_RUST_JSI_STANDALONE", None);
     }
 
-    build.compile("expo_rust_jsi_core_bridge");
+    build.compile("expo_modules_rs_bridge");
 
     println!("cargo:rerun-if-changed=src/bridge.rs");
     println!("cargo:rerun-if-changed=cpp/jsi_shim.h");
