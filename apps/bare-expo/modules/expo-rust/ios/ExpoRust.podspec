@@ -78,16 +78,6 @@ Pod::Spec.new do |s|
       # Move to the package root (one level up from ios/)
       cd "${PODS_TARGET_SRCROOT}/.."
 
-      # Resolve expo-modules-rs and generate .cargo/config.toml
-      # This ensures cargo can find the core crate regardless of
-      # package manager (npm, yarn, pnpm, bun).
-      echo "Resolving expo-modules-rs..."
-      node scripts/resolve-rust-core.js
-      if [ $? -ne 0 ]; then
-        echo "error: Failed to resolve expo-modules-rs. Is it installed?"
-        exit 1
-      fi
-
       # Determine Rust target based on platform and architecture
       if [ "${PLATFORM_NAME}" = "iphonesimulator" ]; then
         if [ "${ARCHS}" = "arm64" ]; then

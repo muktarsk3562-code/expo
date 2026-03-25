@@ -3,18 +3,16 @@ project(expo-rust)
 
 set(CMAKE_CXX_STANDARD 20)
 
-# --- Resolve expo-modules-rs path ---
+# --- Resolve expo-modules-rs path from cargo registry ---
 # The core package contains the C++ shim and cxx bridge headers.
-# Use the resolve script to find it (works with npm, yarn, pnpm, bun).
-execute_process(
-    COMMAND node "${CMAKE_CURRENT_SOURCE_DIR}/../scripts/resolve-rust-core.js" "--print-path"
-    OUTPUT_VARIABLE RUST_CORE_PATH
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    RESULT_VARIABLE RESOLVE_RESULT
-)
-if(NOT RESOLVE_RESULT EQUAL 0)
-    message(FATAL_ERROR "Failed to resolve expo-modules-rs. Is it installed?")
+file(GLOB RUST_CORE_CANDIDATES "$ENV{HOME}/.cargo/registry/src/*/expo-modules-rs-*/cpp")
+list(LENGTH RUST_CORE_CANDIDATES RUST_CORE_COUNT)
+if(RUST_CORE_COUNT EQUAL 0)
+    message(FATAL_ERROR "Failed to find expo-modules-rs in cargo registry. Run 'cargo fetch' first.")
 endif()
+# Use the last match (latest version)
+list(GET RUST_CORE_CANDIDATES -1 CPP_DIR_FROM_REGISTRY)
+get_filename_component(RUST_CORE_PATH "${CPP_DIR_FROM_REGISTRY}" DIRECTORY)
 message(STATUS "expo-modules-rs resolved: ${RUST_CORE_PATH}")
 
 # --- Rust library ---

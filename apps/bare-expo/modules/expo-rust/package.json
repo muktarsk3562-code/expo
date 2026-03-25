@@ -9,14 +9,10 @@
   "author": "Expo",
   "homepage": "https://expo.dev",
   "scripts": {
-    "resolve-rust-core": "node scripts/resolve-rust-core.js",
-    "build:rust": "node scripts/resolve-rust-core.js && cargo build --release",
-    "build:rust:android": "node scripts/resolve-rust-core.js && cargo ndk -t armeabi-v7a -t arm64-v8a -t x86 -t x86_64 build --release",
-    "build:rust:ios": "node scripts/resolve-rust-core.js && cargo build --release --target aarch64-apple-ios && cargo build --release --target x86_64-apple-ios",
+    "build:rust": "cargo build --release",
+    "build:rust:android": "cargo ndk -t armeabi-v7a -t arm64-v8a -t x86 -t x86_64 build --release",
+    "build:rust:ios": "cargo build --release --target aarch64-apple-ios && cargo build --release --target x86_64-apple-ios",
     "clean": "cargo clean"
-  },
-  "dependencies": {
-    "expo-modules-rs": "workspace:*"
   },
   "peerDependencies": {
     "expo": "workspace:*",
