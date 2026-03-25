@@ -2,8 +2,6 @@
 
 #import <ExpoModulesWorklets/EXJavaScriptSerializable.h>
 #import <ExpoModulesWorklets/SerializableExtractor.h>
-#import <ExpoModulesJSI/EXJavaScriptValue.h>
-#import <ExpoModulesJSI/EXJavaScriptRuntime.h>
 
 #if WORKLETS_ENABLED
 

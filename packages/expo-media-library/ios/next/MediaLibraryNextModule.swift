@@ -206,23 +206,23 @@ public final class MediaLibraryNextModule: Module {
     }
 
     AsyncFunction("getPermissionsAsync") { (writeOnly: Bool, promise: Promise) in
-      appContext?
-        .permissions?
-        .getPermissionUsingRequesterClass(
-          requesterClass(writeOnly),
-          resolve: promise.resolver,
-          reject: promise.legacyRejecter
-        )
+//      appContext?
+//        .permissions?
+//        .getPermissionUsingRequesterClass(
+//          requesterClass(writeOnly),
+//          resolve: promise.resolver,
+//          reject: promise.legacyRejecter
+//        )
     }
 
     AsyncFunction("requestPermissionsAsync") { (writeOnly: Bool, promise: Promise) in
-      appContext?
-        .permissions?
-        .askForPermission(
-          usingRequesterClass: requesterClass(writeOnly),
-          resolve: promise.resolver,
-          reject: promise.legacyRejecter
-        )
+//      appContext?
+//        .permissions?
+//        .askForPermission(
+//          usingRequesterClass: requesterClass(writeOnly),
+//          resolve: promise.resolver,
+//          reject: promise.legacyRejecter
+//        )
     }
   }
 

@@ -2,7 +2,6 @@
 
 #import <ReactCommon/RCTTurboModule.h>
 #import <ExpoModulesCore/ExpoBridgeModule.h>
-#import <ExpoModulesCore/EXRuntime.h>
 #import <ExpoModulesCore/Swift.h>
 
 @implementation ExpoBridgeModule
@@ -40,26 +39,26 @@ RCT_EXPORT_MODULE(ExpoModulesCore);
 
 - (void)maybeSetupAppContext
 {
-  if (!_bridge) {
-    return;
-  }
-  EXRuntime *runtime = [EXJavaScriptRuntimeManager runtimeFromBridge:_bridge];
+//  if (!_bridge) {
+//    return;
+//  }
+//  EXRuntime *runtime = [EXJavaScriptRuntimeManager runtimeFromBridge:_bridge];
 
-  if (!runtime) {
-    NSLog(@"Unable to get the JSI runtime from the bridge instance, make sure to use ExpoReactNativeFactory for newer bridgeless integration");
-    return;
-  }
+//  if (!runtime) {
+//    NSLog(@"Unable to get the JSI runtime from the bridge instance, make sure to use ExpoReactNativeFactory for newer bridgeless integration");
+//    return;
+//  }
 
   // If `global.expo` is defined, the app context has already been initialized from `ExpoReactNativeFactory`.
   // The factory was introduced in SDK 55 and requires migration in bare workflow projects.
   // We keep this as an alternative way during the transitional period.
-  if (![[runtime global] hasProperty:@"expo"]) {
-    NSLog(@"Expo is being initialized from the deprecated ExpoBridgeModule, make sure to migrate to ExpoReactNativeFactory in your project");
+//  if (![[runtime global] hasProperty:@"expo"]) {
+//    NSLog(@"Expo is being initialized from the deprecated ExpoBridgeModule, make sure to migrate to ExpoReactNativeFactory in your project");
+//  }
 
-    _appContext.reactBridge = _bridge;
-    _appContext._runtime = runtime;
-    [_appContext registerNativeModules];
-  }
+//    _appContext.reactBridge = _bridge;
+//    _appContext._runtime = runtime;
+//    [_appContext registerNativeModules];
 }
 
 /**
@@ -78,10 +77,10 @@ RCT_EXPORT_MODULE(ExpoModulesCore);
  */
 RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(installModules)
 {
-  if (_bridge && !_appContext._runtime) {
-    // If `setBridge:` was called but the runtime was not found, we try again here.
-    [self maybeSetupAppContext];
-  }
+//  if (_bridge && !_appContext._runtime) {
+//    // If `setBridge:` was called but the runtime was not found, we try again here.
+//    [self maybeSetupAppContext];
+//  }
   return nil;
 }
 

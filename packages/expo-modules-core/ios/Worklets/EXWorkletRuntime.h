@@ -1,7 +1,6 @@
 // Copyright 2025-present 650 Industries. All rights reserved.
 
-#import <ExpoModulesJSI/EXJavaScriptRuntime.h>
-#import <ExpoModulesJSI/EXJavaScriptObject.h>
+#import <ExpoModulesCore/ExpoModulesCore-umbrella.h>
 
 #ifdef __cplusplus
 #if WORKLETS_ENABLED
