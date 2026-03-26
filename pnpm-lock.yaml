@@ -4589,6 +4589,8 @@ importers:
         specifier: workspace:*
         version: link:../expo-module-scripts
 
+  packages/expo-modules-jsi: {}
+
   packages/expo-modules-test-core:
     dependencies:
       '@types/node':
